@@ -1,0 +1,17 @@
+{
+  "name": "Part3",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+  ],
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+  "forwardPorts": [
+    9003
+  ],
+  "extensions": [
+    "xdebug.php-debug",
+    "bmewburn.vscode-intelephense-client",
+    "oderwat.indent-rainbow",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

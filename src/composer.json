@@ -1,0 +1,16 @@
+{
+    "name": "root/html",
+    "require-dev": {
+        "squizlabs/php_codesniffer": "3.*",
+        "phpmd/phpmd": "@stable",
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^0.12.81",
+        "barryvdh/laravel-ide-helper": "^2.9"
+    },
+    "scripts": {
+        "phpcs": "./vendor/bin/phpcs --standard=phpcs.xml",
+        "phpmd": "./vendor/bin/phpmd . text rulesets.xml --suffixes php --exclude node_modules,resources,storage,vendor",
+        "phpunit": "./vendor/bin/phpunit",
+        "phpstan": "vendor/bin/phpstan analyse -c phpstan.neon"
+    }
+}
