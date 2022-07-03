@@ -1,0 +1,53 @@
+@startuml Blackjack
+
+class Main {
+}
+
+class Game {
+  -NUM_OF_CARDS_IN_HAND
+  -Deck deck
+  -Player player
+  -Dealer dealer
+  +__construct()
+  +getDeck()
+  +getPlayer()
+  +getDealer()
+  +start()
+  +showStartMesssage()
+
+}
+
+class Player {
+  -array hand
+  +__construct()
+  +getHand()
+  +drawHand()
+  +calcScoreTotal()
+}
+
+class Dealer {
+}
+
+class Deck {
+  -Card card
+  -array deck
+  +__construct()
+  +getDeck()
+  +initDeck()
+  +takeCard()
+}
+
+class Card {
+  -CARD_SCORE
+  -array suits
+  +createNewDeck()
+}
+
+Main -- Game
+Game -- Deck
+Game -- Player
+Deck -- Card
+
+Player <|-- Dealer
+
+@enduml

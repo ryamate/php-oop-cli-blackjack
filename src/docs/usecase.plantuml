@@ -1,0 +1,23 @@
+@startuml Blackjack
+left to right direction
+actor Player <<MAN>> as p
+actor Dealer <<CPU>> as d
+
+rectangle Blackjack {
+  usecase "ゲームスタートする" as UC1
+  usecase "デッキからカードを引く" as UC2
+  usecase "勝敗を判定する" as UC3
+  usecase "ゲームを終了する" as UC4
+}
+
+p --> UC1
+p --> UC2
+p --> UC3
+p --> UC4
+
+UC1 <-- d
+UC2 <-- d
+UC3 <-- d
+UC4 <-- d
+
+@enduml
