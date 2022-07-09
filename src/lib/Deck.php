@@ -14,11 +14,9 @@ class Deck
     /**
      * コンストラクタ
      *
-     * @param Card $card
      * @param array $deck
      */
     public function __construct(
-        private Card $card = new Card,
         private array $deck = []
     ) {
     }
@@ -40,7 +38,8 @@ class Deck
      */
     public function initDeck(): array
     {
-        $this->deck = $this->card->createNewDeck();
+        $card = new Card;
+        $this->deck = $card->createNewDeck();
         shuffle($this->deck);
         return $this->deck;
     }
