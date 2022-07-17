@@ -1,0 +1,48 @@
+@startuml Blackjack
+participant Main order 10
+participant Game order 20
+participant Dealer order 30
+participant Player order 40
+participant Deck order 50
+participant Card order 60
+
+skinparam responseMessageBelowArrow true
+Main -> Game : ブラックジャックを\n開始する
+activate Game
+Game -> Deck : デッキ(カード52枚)を初期化する
+activate Deck
+Deck -> Card : カード52枚を取得する
+activate Card
+Card --> Deck : デッキ(カード52枚)を\nシャッフルして返却する
+deactivate Card
+Deck --> Game : デッキ(カード52枚)を返却する
+
+Game -> Player : プレイヤーを取得する
+activate Player
+Player -> Deck : 手札2枚を取得する
+Deck --> Player : 手札2枚を返却する
+Player --> Game : プレイヤーを返却する
+
+Game ->  Dealer : ディーラーを取得する
+activate  Dealer
+Dealer -> Deck : 手札2枚を取得する
+Deck --> Dealer : 手札2枚を返却する
+Dealer --> Game : ディーラーを返却する
+
+Game ->  Game : ブラックジャックの開始時の\nメッセージを表示する
+
+note over Game
+ブラックジャックを開始します。
+あなたの引いたカードはハートの7です。
+あなたの引いたカードはクラブの8です。
+ディーラーの引いたカードはダイヤのQです。
+ディーラーの引いた2枚目のカードはわかりません。
+あなたの現在の得点は15です。カードを引きますか？（Y/N）
+end note
+
+deactivate Deck
+deactivate Game
+deactivate Dealer
+deactivate Player
+
+@enduml
