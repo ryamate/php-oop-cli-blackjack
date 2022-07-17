@@ -14,7 +14,7 @@ class Deck
     /**
      * コンストラクタ
      *
-     * @param array $deck
+     * @param array $deck デッキ
      */
     public function __construct(
         private array $deck = []
@@ -45,13 +45,12 @@ class Deck
     }
 
     /**
-     * カードを取られる
+     * プレイヤーに、デッキからカードを１枚引かれる
      *
-     * @param integer $countOfCard
      * @return void
      */
-    public function takeCard(int $countOfCard): void
+    public function takeACard(): void
     {
-        $this->deck = array_slice($this->deck, $countOfCard);
+        $this->deck = array_slice($this->deck, 1);
     }
 }

@@ -8,13 +8,21 @@ use Blackjack\Deck;
 
 class Player
 {
+
+    private const INIT_NUM_OF_CARDS_IN_HAND = 2;
+
     /**
      * コンストラクタ
      *
-     * @param array $hand
+     * @param array $hand 手札
+     * @param int $scoreTotal プレイヤーの現在の得点
+     * @param int $status プレイヤーの状態
      */
-    public function __construct(private array $hand = [])
-    {
+    public function __construct(
+        private array $hand = [],
+        private int $scoreTotal = 0,
+        private string $status = 'hit'
+    ) {
     }
 
     /**
@@ -28,27 +36,73 @@ class Player
     }
 
     /**
-     * 手札を引く
+     * 得点を返す
      *
-     * @return array $hand 2枚の手札
+     * @return int $this->scoreTotal 得点
      */
-    public function drawHand(Deck $deck): array
+    public function getScoreTotal(): int
     {
-        $this->hand = array_slice($deck->getDeck(), 0, 2);
-        return $this->hand;
+        return $this->scoreTotal;
+    }
+
+    /**
+     * プレイヤーの状態を返す
+     *
+     * @return string $this->status プレイヤーの状態
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * 手札を初期化する
+     *
+     * @param Deck $deck
+     * @return void
+     */
+    public function initHand(Deck $deck): void
+    {
+        for ($i = 1; $i <= self::INIT_NUM_OF_CARDS_IN_HAND; $i++) {
+            $this->drawACard($deck);
+        }
+        $this->calcScoreTotal();
+    }
+
+    /**
+     * デッキからカードを引いて、手札に加える
+     *
+     * @param Deck $deck
+     * @return void
+     */
+    public function drawACard(Deck $deck): void
+    {
+        $cardDrawn =  array_slice($deck->getDeck(), 0, 1);
+        $deck->takeACard();
+        $this->hand = array_merge($this->hand, $cardDrawn);
+        $this->calcScoreTotal();
     }
 
     /**
      * プレイヤーの現在の得点を計算する
      *
-     * @return int $scoreTotal プレイヤーの現在の得点
      */
-    public function calcScoreTotal(): int
+    private function calcScoreTotal(): void
     {
-        $scoreTotal = 0;
+        $this->scoreTotal = 0;
         foreach ($this->hand as $card) {
-            $scoreTotal += $card['score'];
+            $this->scoreTotal += $card['score'];
         }
-        return $scoreTotal;
+    }
+
+    /**
+     * ステータスを変更する
+     *
+     * @param string $status
+     * @return void
+     */
+    public function changeStatus(string $status): void
+    {
+        $this->status = $status;
     }
 }

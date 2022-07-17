@@ -4,7 +4,6 @@ class Main {
 }
 
 class Game {
-  -NUM_OF_CARDS_IN_HAND
   -Deck deck
   -Player player
   -Dealer dealer
@@ -18,23 +17,32 @@ class Game {
 }
 
 class Player {
+  -INIT_NUM_OF_CARDS_IN_HAND
   -array hand
+  -int scoreTotal
+  -string status
   +__construct()
   +getHand()
-  +drawHand()
-  +calcScoreTotal()
+  +getScoreTotal()
+  +getStatus()
+  +initHand()
+  +drawACard()
+  -calcScoreTotal()
+  +changeStatus()
 }
 
 class Dealer {
+  +checkBurst()
+  +judgeWinOrLose()
+  +drawAfterAllPlayerStand()
 }
 
 class Deck {
-  -Card card
   -array deck
   +__construct()
   +getDeck()
   +initDeck()
-  +takeCard()
+  +takeACard()
 }
 
 class Card {

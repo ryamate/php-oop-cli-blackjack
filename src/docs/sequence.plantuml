@@ -32,13 +32,86 @@ Dealer --> Game : ディーラーを返却する
 Game ->  Game : ブラックジャックの開始時の\nメッセージを表示する
 
 note over Game
-ブラックジャックを開始します。
-あなたの引いたカードはハートの7です。
-あなたの引いたカードはクラブの8です。
-ディーラーの引いたカードはダイヤのQです。
-ディーラーの引いた2枚目のカードはわかりません。
-あなたの現在の得点は15です。カードを引きますか？（Y/N）
+  ブラックジャックを開始します。
+  あなたの引いたカードはハートの7です。
+  あなたの引いたカードはクラブの8です。
+  ディーラーの引いたカードはダイヤのQです。
+  ディーラーの引いた2枚目のカードはわかりません。
+  あなたの現在の得点は15です。カードを引きますか？（Y/N）
 end note
+
+alt Y (Hit)
+  Game -> Player : 1枚カードを引く
+  Player -> Deck : 1枚カードを引く
+  Deck --> Player : 1枚カードを返す
+  Player --> Game : 1枚カードを返す
+
+  Game -> Dealer : バーストか否かチェックする
+
+  alt カードの合計値が 21 を超えていない場合
+    Dealer --> Game :
+    note over Game
+      あなたの引いたカードはスペードの５です。
+      あなたの現在の得点は20です。カードを引きますか？（Y/N）
+    end note
+  else Burst (カードの合計値が 21 を超えていた場合)
+    Dealer -> Player : ステータスを\n「burst」に変更する
+    Dealer --> Game :
+
+  end
+else N (Stand)
+
+  note over Game
+    ディーラーの引いた2枚目のカードはダイヤの2でした。
+    ディーラーの現在の得点は12です。
+  end note
+
+  Game -> Player : ステータスを\n「stand」に変更する
+
+else 再入力
+  note over Game
+    Y/N で入力してください。カードを引きますか？（Y/N）
+  end note
+  Game -> Game : 再入力
+end
+
+alt Burst (プレイヤーのカードの合計値が 21 を超えていた場合)
+  note over Game
+    あなたの引いたカードはダイヤのJです。
+    あなたの現在の得点は25です。
+    合計値が21を超えたので、あなたの負けです。
+  end note
+  Game --> Main : ゲーム終了
+end
+
+Game -> Dealer : ディーラーは自分のカードの合計値が\n 17 以上になるまで引き続ける
+
+
+alt Burst (ディーラーのカードの合計値が 21 を超えていた場合)
+
+  note over Game
+    ディーラーの引いたカードはハートのKです。
+  end note
+  note over Game
+    ディーラーの得点は22です。
+    合計値が21を超えたので、ディーラーはバーストしました。
+    あなたの勝ちです！
+  end note
+  Game --> Main : ゲーム終了
+
+else ディーラーのカードの合計値が 21 を超えていない場合
+
+  Game -> Dealer : 勝敗を判定する
+  Dealer -> Dealer : スコアを取得する
+  Dealer -> Player : スコアを取得する
+  Dealer -> Game : 勝敗の判定を返す
+
+  note over Game
+    あなたの勝ちです！
+    ブラックジャックを終了します。
+  end note
+
+end
 
 deactivate Deck
 deactivate Game
