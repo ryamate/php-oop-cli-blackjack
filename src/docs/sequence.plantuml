@@ -13,9 +13,9 @@ Game -> Deck : デッキ(カード52枚)を初期化する
 activate Deck
 Deck -> Card : カード52枚を取得する
 activate Card
-Card --> Deck : デッキ(カード52枚)を\nシャッフルして返却する
+Card --> Deck : カード52枚を返却する
 deactivate Card
-Deck --> Game : デッキ(カード52枚)を返却する
+Deck --> Game : デッキ(カード52枚)をシャッフルして返却する
 
 Game -> Player : プレイヤーを取得する
 activate Player
