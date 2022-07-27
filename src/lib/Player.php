@@ -8,15 +8,14 @@ use Blackjack\Deck;
 
 class Player
 {
-
     private const INIT_NUM_OF_CARDS_IN_HAND = 2;
 
     /**
      * コンストラクタ
      *
-     * @param array $hand 手札
+     * @param array<int,array<string,int|string>> $hand 手札
      * @param int $scoreTotal プレイヤーの現在の得点
-     * @param int $status プレイヤーの状態
+     * @param string $status プレイヤーの状態
      */
     public function __construct(
         private array $hand = [],
@@ -28,7 +27,7 @@ class Player
     /**
      * 手札を返す
      *
-     * @return array $this->hand 手札
+     * @return array<int,array<string,int|string>> $this->hand 手札
      */
     public function getHand(): array
     {

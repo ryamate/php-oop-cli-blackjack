@@ -2,13 +2,13 @@
 
 namespace Blackjack;
 
+require_once('Deck.php');
 require_once('Player.php');
 require_once('Dealer.php');
-require_once('Deck.php');
 
+use Blackjack\Deck;
 use Blackjack\Player;
 use Blackjack\Dealer;
-use Blackjack\Deck;
 
 class Game
 {
@@ -20,10 +20,14 @@ class Game
      * @param Dealer $dealer
      */
     public function __construct(
-        private Deck $deck = new Deck(),
-        private Player $player = new Player(),
-        private Dealer $dealer = new Dealer(),
+        private ?Deck $deck = null,
+        private ?Player $player = null,
+        private ?Dealer $dealer = null,
     ) {
+        $this->deck = $deck ?? new Deck();
+        $this->player = $player ?? new Player();
+        $this->dealer = $dealer ?? new Dealer();
+
         $this->deck->initDeck();
         $this->player->initHand($this->deck);
         $this->dealer->initHand($this->deck);
@@ -75,10 +79,9 @@ class Game
             if ($inputYesOrNo === 'Y') {
                 $this->player->drawACard($this->deck);
                 $this->dealer->checkBurst($this->player);
-                if ($this->player->getStatus() === 'burst') {
-                    break;
+                if ($this->player->getStatus() === 'hit') {
+                    $this->displayProgressMessage();
                 }
-                $this->displayProgressMessage();
             } elseif ($inputYesOrNo === 'N') {
                 $this->displayStandMessage();
                 $this->player->changeStatus('stand');
@@ -90,23 +93,21 @@ class Game
         // プレイヤーのカードの合計値が 21 を超えていた場合
         if ($this->player->getStatus() === 'burst') {
             $this->displayLoseByBurstMessage();
-            exit; // ゲーム終了
+        } elseif ($this->player->getStatus() === 'stand') {
+            // ディーラーは自分のカードの合計値が17以上になるまで引き続ける
+            $this->dealer->drawAfterAllPlayerStand($this->deck);
+            $this->dealer->checkBurst($this->dealer);
+            $this->displayCardsDrawnByDealer();
+
+            // ディーラーのカードの合計値が 21 を超えていた場合
+            if ($this->dealer->getStatus() === 'burst') {
+                $this->displayWinByBurstMessage();
+            } else {
+                // 勝敗を判定する
+                $this->dealer->judgeWinOrLose($this->player, $this->dealer);
+                $this->displayResultMessage();
+            }
         }
-
-        // ディーラーは自分のカードの合計値が17以上になるまで引き続ける
-        $this->dealer->drawAfterAllPlayerStand($this->deck);
-        $this->displayCardsDrawnByDealer();
-
-        // ディーラーのカードの合計値が 21 を超えていた場合
-        if ($this->dealer->getStatus() === 'burst') {
-            $this->displayWinByBurstMessage();
-            exit; // ゲーム終了
-        }
-
-        // 勝敗を判定する
-        $this->dealer->judgeWinOrLose($this->player, $this->dealer);
-        $this->displayResultMessage();
-        exit;
     }
 
     /**
@@ -169,7 +170,6 @@ class Game
         echo 'ディーラーの得点は' . $this->dealer->getScoreTotal() . 'です。' . PHP_EOL;
         echo '合計値が21を超えたので、ディーラーはバーストしました。' . PHP_EOL;
         echo 'あなたの勝ちです！' . PHP_EOL;
-        exit;
     }
 
     /**

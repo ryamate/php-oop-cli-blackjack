@@ -9,7 +9,7 @@ use Blackjack\Deck;
 
 class DeckTest extends TestCase
 {
-    public function testInitDeck()
+    public function testInitDeck(): void
     {
         $deck = new Deck();
         // デッキの枚数をテストする

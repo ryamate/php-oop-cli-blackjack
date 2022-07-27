@@ -9,7 +9,7 @@ use Blackjack\Game;
 
 class GameTest extends TestCase
 {
-    public function testStart()
+    public function testStart(): void
     {
         $game = new Game();
 

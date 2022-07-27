@@ -24,7 +24,7 @@ class Card
         'K' => 10,
     ];
 
-    /** 各カードのマーク */
+    /** @var array<int,string> $suits 各カードのマーク */
     private array $suits = [
         'スペード',
         'ハート',
@@ -35,7 +35,7 @@ class Card
     /**
      * 新しくデッキを作成する
      *
-     * @return array $deck デッキ
+     * @return array<int,array<string,int|string>> $deck デッキ
      */
     public function createNewDeck(): array
     {
