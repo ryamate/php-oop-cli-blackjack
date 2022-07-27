@@ -14,7 +14,7 @@ class Deck
     /**
      * コンストラクタ
      *
-     * @param array $deck デッキ
+     * @param array<int,array<string,int|string>> $deck デッキ
      */
     public function __construct(
         private array $deck = []
@@ -24,7 +24,7 @@ class Deck
     /**
      * deck プロパティを返す
      *
-     * @return array
+     * @return array<int,array<string,int|string>> $deck デッキ
      */
     public function getDeck(): array
     {
@@ -34,11 +34,11 @@ class Deck
     /**
      * デッキを初期化する
      *
-     * @return array $this->deck
+     * @return array<int,array<string,int|string>> $deck デッキ
      */
     public function initDeck(): array
     {
-        $card = new Card;
+        $card = new Card();
         $this->deck = $card->createNewDeck();
         shuffle($this->deck);
         return $this->deck;

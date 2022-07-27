@@ -9,7 +9,7 @@ use Blackjack\Card;
 
 class CardTest extends TestCase
 {
-    public function testCreateNewDeck()
+    public function testCreateNewDeck(): void
     {
         $card = new Card();
         // カードの枚数をテストする
