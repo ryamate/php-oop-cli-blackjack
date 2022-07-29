@@ -34,10 +34,6 @@ class PlayerTest extends TestCase
         $this->assertSame(3, count($player->getHand()));
     }
 
-    // public function testCalcScoreTotal()
-    // {
-    // }
-
     public function testChangeStatus(): void
     {
         $player = new Player();
