@@ -3,9 +3,11 @@
 namespace Blackjack\Tests;
 
 require_once(__DIR__ . '/../lib/Game.php');
+require_once(__DIR__ . '/../lib/Card.php');
 
 use PHPUnit\Framework\TestCase;
 use Blackjack\Game;
+use Blackjack\Card;
 
 class GameTest extends TestCase
 {

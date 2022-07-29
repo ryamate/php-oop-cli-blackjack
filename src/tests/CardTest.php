@@ -12,7 +12,8 @@ class CardTest extends TestCase
     public function testCreateNewDeck(): void
     {
         $card = new Card();
+        $deck = $card->createNewDeck();
         // カードの枚数をテストする
-        $this->assertSame(52, count($card->createNewDeck()));
+        $this->assertSame(52, count($deck));
     }
 }
