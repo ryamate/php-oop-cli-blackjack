@@ -7,9 +7,8 @@ namespace Blackjack;
  */
 class Card
 {
-    /** 各カードの点数 */
+    /**  array<string,int> 各カードの点数 */
     private const CARD_SCORE = [
-        'A' => 1, // Aは1点あるいは11点として、手の点数が最大となる方で数える
         '2' => 2, // 2から9までは、書かれている数の通りの点数
         '3' => 3,
         '4' => 4,
@@ -22,6 +21,7 @@ class Card
         'J' => 10,
         'Q' => 10,
         'K' => 10,
+        'A' => 11, // Aは1点あるいは11点として、手の点数が最大となる方で数える（初期値 11 にする）
     ];
 
     /** @var array<int,string> $suits 各カードのマーク */
@@ -48,7 +48,9 @@ class Card
                     'score' => $score,
                 ];
             }
+            unset($num);
         }
+        unset($suit);
         return $deck;
     }
 }
