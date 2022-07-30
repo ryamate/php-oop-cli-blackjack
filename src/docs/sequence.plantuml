@@ -41,12 +41,13 @@ note over Game
 end note
 
 alt Y (Hit)
-  Game -> Player : 1枚カードを引く
+  Game -> Player : プレイヤーは1枚カードを引く
   Player -> Deck : 1枚カードを引く
   Deck --> Player : 1枚カードを返す
-  Player --> Game : 1枚カードを返す
+  Player -> Player : 得点を計算する
 
-  Game -> Dealer : バーストか否かチェックする
+  Game -> Dealer : ディーラーはバーストか否かチェックする
+  Dealer -> Player : バーストか否かチェックする
 
   alt カードの合計値が 21 を超えていない場合
     Dealer --> Game :
@@ -76,41 +77,46 @@ else 再入力
 end
 
 alt Burst (プレイヤーのカードの合計値が 21 を超えていた場合)
-  note over Game
+
+  note over Game #Yellow
     あなたの引いたカードはダイヤのJです。
     あなたの現在の得点は25です。
     合計値が21を超えたので、あなたの負けです。
   end note
+
+else Stand (プレイヤーのカードの合計値が 21 以下の場合)
+
+    Game -> Dealer : ディーラーは自分のカードの合計値が\n 17 以上になるまで引き続ける
+  loop
+    Dealer -> Deck : 1枚カードを引く
+    Deck --> Dealer : 1枚カードを返す
+    Dealer -> Dealer : 得点を計算する
+  end
+
+  alt Burst (ディーラーのカードの合計値が 21 を超えていた場合)
+
+    note over Game
+      ディーラーの引いたカードはハートのKです。
+    end note
+    note over Game #Yellow
+      ディーラーの得点は22です。
+      合計値が21を超えたので、ディーラーはバーストしました。
+      あなたの勝ちです！
+    end note
+
+  else ディーラーのカードの合計値が 21 を超えていない場合
+
+    Game -> Dealer : 勝敗を判定する
+    Dealer -> Dealer : スコアを取得する
+    Dealer -> Player : スコアを取得する
+    Dealer -> Game : 勝敗の判定を返す
+
+    note over Game #Yellow
+      あなたの勝ちです！
+      ブラックジャックを終了します。
+    end note
+  end
   Game --> Main : ゲーム終了
-end
-
-Game -> Dealer : ディーラーは自分のカードの合計値が\n 17 以上になるまで引き続ける
-
-
-alt Burst (ディーラーのカードの合計値が 21 を超えていた場合)
-
-  note over Game
-    ディーラーの引いたカードはハートのKです。
-  end note
-  note over Game
-    ディーラーの得点は22です。
-    合計値が21を超えたので、ディーラーはバーストしました。
-    あなたの勝ちです！
-  end note
-  Game --> Main : ゲーム終了
-
-else ディーラーのカードの合計値が 21 を超えていない場合
-
-  Game -> Dealer : 勝敗を判定する
-  Dealer -> Dealer : スコアを取得する
-  Dealer -> Player : スコアを取得する
-  Dealer -> Game : 勝敗の判定を返す
-
-  note over Game
-    あなたの勝ちです！
-    ブラックジャックを終了します。
-  end note
-
 end
 
 deactivate Deck

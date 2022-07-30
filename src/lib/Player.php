@@ -15,11 +15,13 @@ class Player
      *
      * @param array<int,array<string,int|string>> $hand 手札
      * @param int $scoreTotal プレイヤーの現在の得点
+     * @param int $countAce プレイヤーの引いた A の枚数
      * @param string $status プレイヤーの状態
      */
     public function __construct(
         private array $hand = [],
         private int $scoreTotal = 0,
+        private int $countAce = 0,
         private string $status = 'hit'
     ) {
     }
@@ -42,6 +44,16 @@ class Player
     public function getScoreTotal(): int
     {
         return $this->scoreTotal;
+    }
+
+    /**
+     * 引いた A の枚数を返す
+     *
+     * @return int $this->countAce 得点
+     */
+    public function getCountAce(): int
+    {
+        return $this->countAce;
     }
 
     /**
@@ -89,8 +101,28 @@ class Player
     private function calcScoreTotal(): void
     {
         $this->scoreTotal = 0;
+        $this->countAce = 0;
         foreach ($this->hand as $card) {
+            if ($card['num'] === 'A') {
+                ++$this->countAce;
+            }
             $this->scoreTotal += $card['score'];
+        }
+        unset($card);
+        $this->calcAceScore();
+    }
+
+    /**
+     * A の点数については、デフォルト 11 でカウントされており、
+     * 得点が21点を超えている場合は、 1 でカウントする
+     *
+     */
+    private function calcAceScore(): void
+    {
+        for ($i = 0; $i < $this->getCountAce(); $i++) {
+            if ($this->scoreTotal > 21) {
+                $this->scoreTotal -= 10;
+            }
         }
     }
 
