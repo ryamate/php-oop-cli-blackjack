@@ -8,22 +8,32 @@ use Blackjack\Deck;
 
 class Player
 {
-    private const INIT_NUM_OF_CARDS_IN_HAND = 2;
-
     /**
      * コンストラクタ
      *
+     * @param string $name プレイヤー名
      * @param array<int,array<string,int|string>> $hand 手札
      * @param int $scoreTotal プレイヤーの現在の得点
      * @param int $countAce プレイヤーの引いた A の枚数
      * @param string $status プレイヤーの状態
      */
     public function __construct(
+        private string $name,
         private array $hand = [],
         private int $scoreTotal = 0,
         private int $countAce = 0,
         private string $status = 'hit'
     ) {
+    }
+
+    /**
+     * プレイヤー名を返す
+     *
+     * @return string $this->name プレイヤー名
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
@@ -67,38 +77,22 @@ class Player
     }
 
     /**
-     * 手札を初期化する
+     * 1枚カードを手札に加える
      *
-     * @param Deck $deck
+     * @param array $card
      * @return void
      */
-    public function initHand(Deck $deck): void
+    public function addACardToHand(array $card): void
     {
-        for ($i = 1; $i <= self::INIT_NUM_OF_CARDS_IN_HAND; $i++) {
-            $this->drawACard($deck);
-        }
-        $this->calcScoreTotal();
-    }
-
-    /**
-     * デッキからカードを引いて、手札に加える
-     *
-     * @param Deck $deck
-     * @return void
-     */
-    public function drawACard(Deck $deck): void
-    {
-        $cardDrawn =  array_slice($deck->getDeck(), 0, 1);
-        $deck->takeACard();
-        $this->hand = array_merge($this->hand, $cardDrawn);
-        $this->calcScoreTotal();
+        $this->hand = array_merge($this->hand, $card);
     }
 
     /**
      * プレイヤーの現在の得点を計算する
      *
+     * @return void
      */
-    private function calcScoreTotal(): void
+    public function calcScoreTotal(): void
     {
         $this->scoreTotal = 0;
         $this->countAce = 0;
@@ -112,14 +106,16 @@ class Player
         $this->calcAceScore();
     }
 
+
     /**
      * A の点数については、デフォルト 11 でカウントされており、
      * 得点が21点を超えている場合は、 1 でカウントする
      *
+     * @return void
      */
     private function calcAceScore(): void
     {
-        for ($i = 0; $i < $this->getCountAce(); $i++) {
+        for ($i = 0; $i < $this->countAce; $i++) {
             if ($this->scoreTotal > 21) {
                 $this->scoreTotal -= 10;
             }

@@ -11,32 +11,9 @@ use Blackjack\Deck;
 
 class PlayerTest extends TestCase
 {
-    public function testInitHand(): void
-    {
-        $player = new Player();
-        $deck = new Deck();
-        $deck->initDeck();
-        $player->initHand($deck);
-
-        // カードの枚数をテストする
-        $this->assertSame(2, count($player->getHand()));
-    }
-
-    public function testDrawACard(): void
-    {
-        $player = new Player();
-        $deck = new Deck();
-        $deck->initDeck();
-        $player->initHand($deck);
-        $player->drawACard($deck);
-
-        // カードの枚数をテストする
-        $this->assertSame(3, count($player->getHand()));
-    }
-
     public function testChangeStatus(): void
     {
-        $player = new Player();
+        $player = new Player('test');
         $player->changeStatus('burst');
         $this->assertSame('burst', $player->getStatus());
     }

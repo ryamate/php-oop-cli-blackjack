@@ -4,9 +4,9 @@ class Main {
 }
 
 class Game {
-  -Deck deck
   -Player player
   -Dealer dealer
+  -array npc
   +__construct()
   +getDeck()
   +getPlayer()
@@ -24,7 +24,7 @@ class Game {
 }
 
 class Player {
-  -INIT_NUM_OF_CARDS_IN_HAND
+  -string name
   -array hand
   -int scoreTotal
   -int countAce
@@ -34,17 +34,30 @@ class Player {
   +getScoreTotal()
   +getCountAce()
   +getStatus()
-  +initHand()
-  +drawACard()
   -calcScoreTotal()
   -calcAceScore()
   +changeStatus()
 }
 
 class Dealer {
+  -NUM_OF_FIRST_HAND
+  -Deck deck
+  -string name
+  -array hand
+  -int scoreTotal
+  -int countAce
+  -string status
+  +__construct()
+  +getDeck()
+  +dealOutFirstHand()
+  +dealOneCard()
   +checkBurst()
   +judgeWinOrLose()
   +drawAfterAllPlayerStand()
+}
+
+class NonPlayerCharacter {
+  +selectHitOrStand()
 }
 
 class Deck {
@@ -62,10 +75,13 @@ class Card {
 }
 
 Main -- Game
-Game -- Deck
 Game -- Player
+Game -- NonPlayerCharacter
+Game -- Dealer
+Dealer -- Deck
 Deck -- Card
 
 Player <|-- Dealer
+Player <|-- NonPlayerCharacter
 
 @enduml
