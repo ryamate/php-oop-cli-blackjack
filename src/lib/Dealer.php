@@ -5,7 +5,6 @@ namespace Blackjack;
 require_once('Player.php');
 
 use Blackjack\Player;
-use PDepend\Source\AST\State;
 
 class Dealer extends Player
 {
@@ -93,13 +92,82 @@ class Dealer extends Player
      * 勝敗を判定する
      *
      * @param Player $player
+     * @param array<int,NonPlayerCharacter> $nPCs
      * @return void
      */
-    public function judgeWinOrLose(Player $player)
+    public function judgeWinOrLose(Player $player, array $nPCs)
+    {
+        if ($this->isStandPlayer($player, $nPCs)) {
+            echo $this->getStandMessage();
+            $this->action($this);
+
+            $messages = [];
+            $messages[] = $this->getScoreTotalResultMessage($this);
+
+            $numOfNPC = count($nPCs);
+            if ($this->getStatus() === 'burst') {
+                $messages[] = $this->getDealerBurstMessage();
+
+                if ($player->getStatus() === 'stand') {
+                    $player->changeStatus('win');
+                    $messages[] = $this->getWinByBurstMessage($player);
+                }
+                if ($numOfNPC > 0) {
+                    for ($i = 0; $i < $numOfNPC; $i++) {
+                        if ($nPCs[$i]->getStatus() === 'stand') {
+                            $nPCs[$i]->changeStatus('win');
+                            $messages[] = $this->getWinByBurstMessage($nPCs[$i]);
+                        }
+                    }
+                }
+            } else {
+                if ($player->getStatus() === 'stand') {
+                    $this->compareScoreTotal($player);
+                    $messages[] = $this->getResultMessage($player);
+                }
+                if ($numOfNPC > 0) {
+                    for ($i = 0; $i < $numOfNPC; $i++) {
+                        if ($nPCs[$i]->getStatus() === 'stand') {
+                            $this->compareScoreTotal($nPCs[$i]);
+                            $messages[] = $this->getResultMessage($nPCs[$i]);
+                        }
+                    }
+                }
+            }
+            foreach ($messages as $message) {
+                echo $message;
+            }
+            unset($message);
+        }
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Player $player
+     * @param array $nPCs
+     * @return bool
+     */
+    private function isStandPlayer(Player $player, array $nPCs): bool
+    {
+        if ($player->getStatus() === 'stand') {
+            return true;
+        }
+        $numOfNPC = count($nPCs);
+        if ($numOfNPC > 0) {
+            for ($i = 0; $i < $numOfNPC; $i++) {
+                if ($nPCs[$i]->getStatus() === 'stand') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function compareScoreTotal(Player $player)
     {
         $playerScoreTotal = $player->getScoreTotal();
         $dealerScoreTotal = $this->getScoreTotal();
-
         if ($playerScoreTotal > $dealerScoreTotal) {
             $player->changeStatus('win');
         } elseif ($playerScoreTotal < $dealerScoreTotal) {
@@ -110,14 +178,109 @@ class Dealer extends Player
     }
 
     /**
-     * スタンド（すべてのプレーヤーがカードを引くのをやめた）後に、ディーラーは自分のカードの合計値が17以上になるまで引き続ける
+     * 選択したアクション（ヒットかスタンド）により進行する
      *
+     * @param Dealer $dealer
      * @return void
      */
-    public function drawAfterAllPlayerStand()
+    public function action(Dealer $dealer)
     {
-        while ($this->getScoreTotal() < 17) {
-            $this->dealOneCard($this);
+        while ($this->getStatus() === 'hit') {
+            echo $this->getProgressMessage();
+            $inputYesOrNo = $this->selectHitOrStand();
+
+            if ($inputYesOrNo === 'Y') {
+                $dealer->dealOneCard($dealer);
+                $dealer->checkBurst($dealer);
+                $message = $this->getCardDrawnMessage();
+            } elseif ($inputYesOrNo === 'N') {
+                $this->changeStatus('stand');
+                $message = PHP_EOL . PHP_EOL;
+            }
+            echo $message;
         }
+    }
+
+    /**
+     * ヒットかスタンドを Y/N で選択する（カードの合計値が17以上になるまで引き続ける）
+     *
+     * @return string $inputYesOrNo
+     */
+    public function selectHitOrStand(): string
+    {
+        if ($this->getScoreTotal() < 17) {
+            $inputYesOrNo = 'Y';
+        } else {
+            $inputYesOrNo = 'N';
+        }
+        return $inputYesOrNo;
+    }
+
+    /**
+     * 引いたカード、現在の得点、カードを引くか、のメッセージを返す
+     *
+     * @return string $message
+     */
+    protected function getProgressMessage(): string
+    {
+        $message = $this->getName() . 'の現在の得点は' . $this->getScoreTotal() . 'です。' . PHP_EOL;
+        return $message;
+    }
+
+    /**
+     * これ以上カードを引かないと宣言した後のメッセージを返す
+     *
+     * @return string $message
+     */
+    private function getStandMessage(): string
+    {
+        $dealersHand = $this->getHand();
+        $dealersSecondCard = end($dealersHand);
+        $message = 'ディーラーの引いた2枚目のカードは' .
+            $dealersSecondCard['suit'] . 'の' .
+            $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
+        return $message;
+    }
+
+    /**
+     * ディーラーのカードの合計値が 21 を超え、プレイヤーの勝ちであることを伝えるメッセージを返す
+     *
+     * @return string $message
+     */
+    private function getDealerBurstMessage(): string
+    {
+        $message = '合計値が21を超えたので、ディーラーはバーストしました。' . PHP_EOL;
+        return $message;
+    }
+
+    /**
+     * ディーラーのカードの合計値が 21 を超え、プレイヤーの勝ちであることを伝えるメッセージを返す
+     *
+     * @param Player $player
+     * @return string $message
+     */
+    private function getWinByBurstMessage(Player $player): string
+    {
+        $message = $player->getName() . 'の勝ちです！' . PHP_EOL;
+        return $message;
+    }
+
+    /**
+     * プレイヤーの勝敗結果メッセージを返す
+     *
+     * @param Player $player
+     * @return string $message
+     */
+    private function getResultMessage(Player $player): string
+    {
+        $playerName = $player->getName();
+        if ($player->getStatus() === 'win') {
+            $message = $playerName . 'の勝ちです！' . PHP_EOL;
+        } elseif ($player->getStatus() === 'lose') {
+            $message = $playerName . 'の負けです…' . PHP_EOL;
+        } elseif ($player->getStatus() === 'draw') {
+            $message = $playerName . 'は引き分けです。' . PHP_EOL;
+        }
+        return $message;
     }
 }
