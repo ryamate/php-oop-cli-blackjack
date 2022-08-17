@@ -44,7 +44,7 @@ class Card
             foreach (self::CARD_SCORE as $num => $score) {
                 $deck[] = [
                     'suit' => $suit,
-                    'num' => $num,
+                    'num' => (string)$num,
                     'score' => $score,
                 ];
             }

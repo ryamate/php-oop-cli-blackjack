@@ -2,10 +2,6 @@
 
 namespace Blackjack;
 
-require_once('Deck.php');
-
-use Blackjack\Deck;
-
 class Player
 {
     /**
@@ -77,9 +73,46 @@ class Player
     }
 
     /**
+     * 選択したアクション（ヒットかスタンド）により進行する
+     *
+     * @param Dealer $dealer
+     * @return void
+     */
+    public function action(Dealer $dealer): void
+    {
+        $message = '';
+        while ($this->getStatus() === 'hit') {
+            echo Message::getProgressMessage($this);
+            echo Message::getProgressQuestionMessage();
+            $inputYesOrNo = $this->selectHitOrStand();
+
+            if ($inputYesOrNo === 'Y') {
+                $dealer->dealOneCard($this);
+                $dealer->checkBurst($this);
+                $message = Message::getCardDrawnMessage($this);
+            } elseif ($inputYesOrNo === 'N') {
+                $this->changeStatus('stand');
+                $message = PHP_EOL;
+            }
+            echo $message;
+        }
+    }
+
+    /**
+     * ヒットかスタンドを Y/N で選択する（標準入力を求める）
+     *
+     * @return string
+     */
+    protected function selectHitOrStand(): string
+    {
+        $inputYesOrNo = trim(fgets(STDIN));
+        return $inputYesOrNo;
+    }
+
+    /**
      * 1枚カードを手札に加える
      *
-     * @param array $card
+     * @param array<array<string,string|int>> $card
      * @return void
      */
     public function addACardToHand(array $card): void
@@ -106,10 +139,8 @@ class Player
         $this->calcAceScore();
     }
 
-
     /**
-     * A の点数については、デフォルト 11 でカウントされており、
-     * 得点が21点を超えている場合は、 1 でカウントする
+     * A の点数については、デフォルト 11 でカウントされており、得点が21点を超えている場合は、 1 でカウントする
      *
      * @return void
      */

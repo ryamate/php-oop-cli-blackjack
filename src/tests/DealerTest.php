@@ -5,18 +5,18 @@ namespace Blackjack\Tests;
 require_once(__DIR__ . '/../lib/Dealer.php');
 require_once(__DIR__ . '/../lib/Deck.php');
 require_once(__DIR__ . '/../lib/Player.php');
+require_once(__DIR__ . '/../lib/Message.php');
 
 use PHPUnit\Framework\TestCase;
 use Blackjack\Dealer;
-use Blackjack\Deck;
 use Blackjack\Player;
 
 class DealerTest extends TestCase
 {
     public function testDealOutFirstHand(): void
     {
-        $player = new Player('player');
-        $dealer = new Dealer('dealer');
+        $player = new Player('あなた');
+        $dealer = new Dealer('ディーラー');
         $dealer->dealOutFirstHand($player);
 
         // カードの枚数をテストする
@@ -25,8 +25,8 @@ class DealerTest extends TestCase
 
     public function testDealOneCard(): void
     {
-        $dealer = new Dealer('dealer');
-        $player = new Player('player');
+        $player = new Player('あなた');
+        $dealer = new Dealer('ディーラー');
         $player = $dealer->dealOneCard($player);
 
         // 1枚引いたカードの枚数をテストする
@@ -37,49 +37,66 @@ class DealerTest extends TestCase
         $this->assertSame(2, count($player->getHand()));
     }
 
-
-    public function testCheckBurst()
+    public function testCheckBurst(): void
     {
-        $dealer = new Dealer('dealer');
+        $dealer = new Dealer('ディーラー');
 
-        $player1 = new Player('player1', [], 20, 0, 'hit');
+        $player1 = new Player('プレイヤー1', [], 20, 0, 'hit');
         $this->assertSame(false, $dealer->checkBurst($player1));
-        $player2 = new Player('player2', [], 21, 0, 'hit');
+        $player2 = new Player('プレイヤー2', [], 21, 0, 'hit');
         $this->assertSame(false, $dealer->checkBurst($player2));
-        $player3 = new Player('player3', [], 22, 0, 'hit');
+        $player3 = new Player('プレイヤー3', [], 22, 0, 'hit');
         $this->assertSame(true, $dealer->checkBurst($player3));
     }
 
-    public function testJudgeWinOrLose()
+    public function testJudgeWinOrLose(): void
     {
-        $dealer1 = new Dealer('dealer1', [], 20, 0, 'hit');
-        $player1 = new Player('player1', [], 21, 0, 'hit');
-        $dealer1->judgeWinOrLose($player1);
-        $this->assertSame('win', $player1->getStatus());
+        // ディーラーがバーストしない場合、点数を比較して勝敗を判定されることをテストする
+        $dealer1 = new Dealer('ディーラー1', [
+            ['suit' => 'スペード', 'num' => '10', 'score' => 10],
+            ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
+        ], 20, 0, 'hit');
 
-        $dealer2 = new Dealer('dealer2', [], 21, 0, 'hit');
-        $player2 = new Player('player2', [], 20, 0, 'hit');
-        $dealer2->judgeWinOrLose($player2);
-        $this->assertSame('lose', $player2->getStatus());
+        $players = [];
+        $players[] = new Player('プレイヤー1', [], 21, 0, 'stand');
+        $players[] = new Player('プレイヤー2', [], 20, 0, 'stand');
+        $players[] = new Player('プレイヤー3', [], 19, 0, 'stand');
 
-        $dealer3 = new Dealer('dealer3', [], 20, 0, 'hit');
-        $player3 = new Player('player3', [], 20, 0, 'hit');
-        $dealer3->judgeWinOrLose($player3);
-        $this->assertSame('draw', $player3->getStatus());
+        $dealer1->judgeWinOrLose($players);
+        $this->assertSame('win', $players[0]->getStatus());
+        $this->assertSame('draw', $players[1]->getStatus());
+        $this->assertSame('lose', $players[2]->getStatus());
+
+        // ディーラーがバーストした場合、スタンドのプレイヤーは勝ち、バーストのプレイヤーはバースト
+        // と判定されることをテストする
+        $dealer2 = new Dealer('ディーラー2', [
+            ['suit' => 'スペード', 'num' => '10', 'score' => 10],
+            ['suit' => 'スペード', 'num' => '5', 'score' => 5],
+            ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
+        ], 25, 0, 'burst');
+
+        $players = [];
+        $players[] = new Player('プレイヤー1', [], 21, 0, 'stand');
+        $players[] = new Player('プレイヤー2', [], 20, 0, 'stand');
+        $players[] = new Player('プレイヤー3', [], 19, 0, 'stand');
+        $players[] = new Player('プレイヤー4', [], 25, 0, 'burst');
+
+        $dealer2->judgeWinOrLose($players);
+        $this->assertSame('win', $players[0]->getStatus());
+        $this->assertSame('win', $players[1]->getStatus());
+        $this->assertSame('win', $players[2]->getStatus());
+        $this->assertSame('burst', $players[3]->getStatus());
     }
 
-    public function testDrawAfterAllPlayerStand()
+    public function testSelectHitOrStand(): void
     {
-        $dealer1 = new Dealer('dealer1', [], 20, 0, 'hit');
-        $dealer1->drawAfterAllPlayerStand();
-        $this->assertSame(20, $dealer1->getScoreTotal());
+        $dealer1 = new Dealer('ディーラー1', [], 18, 0, 'hit');
+        $this->assertSame('N', $dealer1->selectHitOrStand());
 
-        $dealer2 = new Dealer('dealer2', [], 17, 0, 'hit');
-        $dealer2->drawAfterAllPlayerStand();
-        $this->assertSame(17, $dealer2->getScoreTotal());
+        $dealer2 = new Dealer('ディーラー2', [], 17, 0, 'hit');
+        $this->assertSame('N', $dealer2->selectHitOrStand());
 
-        $dealer3 = new Dealer('dealer3', [], 16, 0, 'hit');
-        $dealer3->drawAfterAllPlayerStand();
-        $this->assertGreaterThan(16, $dealer3->getScoreTotal());
+        $dealer3 = new Dealer('ディーラー1', [], 16, 0, 'hit');
+        $this->assertSame('Y', $dealer3->selectHitOrStand());
     }
 }
