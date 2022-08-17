@@ -2,10 +2,6 @@
 
 namespace Blackjack;
 
-require_once('Deck.php');
-
-use Blackjack\Deck;
-
 class Player
 {
     /**
@@ -82,19 +78,21 @@ class Player
      * @param Dealer $dealer
      * @return void
      */
-    public function action(Dealer $dealer)
+    public function action(Dealer $dealer): void
     {
+        $message = '';
         while ($this->getStatus() === 'hit') {
-            echo $this->getProgressMessage();
+            echo Message::getProgressMessage($this);
+            echo Message::getProgressQuestionMessage();
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
                 $dealer->dealOneCard($this);
                 $dealer->checkBurst($this);
-                $message = $this->getCardDrawnMessage();
+                $message = Message::getCardDrawnMessage($this);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus('stand');
-                $message = PHP_EOL . PHP_EOL;
+                $message = PHP_EOL;
             }
             echo $message;
         }
@@ -114,7 +112,7 @@ class Player
     /**
      * 1枚カードを手札に加える
      *
-     * @param array $card
+     * @param array<array<string,string|int>> $card
      * @return void
      */
     public function addACardToHand(array $card): void
@@ -142,8 +140,7 @@ class Player
     }
 
     /**
-     * A の点数については、デフォルト 11 でカウントされており、
-     * 得点が21点を超えている場合は、 1 でカウントする
+     * A の点数については、デフォルト 11 でカウントされており、得点が21点を超えている場合は、 1 でカウントする
      *
      * @return void
      */
@@ -165,53 +162,5 @@ class Player
     public function changeStatus(string $status): void
     {
         $this->status = $status;
-    }
-
-    /**
-     * 引いたカード、現在の得点、カードを引くか、のメッセージを表示する
-     *
-     * @return string $message
-     */
-    protected function getProgressMessage(): string
-    {
-        $message =  $this->getName() . 'の現在の得点は' . $this->getScoreTotal() .
-            'です。カードを引きますか？（Y/N）' . PHP_EOL;
-        return $message;
-    }
-
-    /**
-     * 配られたカードを表示する
-     *
-     * @return string $message
-     */
-    protected function getCardDrawnMessage(): string
-    {
-        $hand = $this->getHand();
-        $cardDrawn = end($hand);
-        $message = $this->getName() . 'の引いたカードは' .
-            $cardDrawn['suit'] . 'の' . $cardDrawn['num'] . 'です。' . PHP_EOL;
-        return $message;
-    }
-
-    /**
-     * Y/N 以外の値が入力された時のメッセージを表示する
-     *
-     * @return string
-     */
-    protected function getInputErrorMessage(): string
-    {
-        return 'Y/N で入力してください。' . PHP_EOL;
-    }
-
-    /**
-     * プレイヤーの得点結果メッセージを表示する
-     *
-     * @param Player $player
-     * @return string $message
-     */
-    public function getScoreTotalResultMessage(Player $player): string
-    {
-        $message = $player->getName() . 'の得点は' . $player->getScoreTotal() . 'です。' . PHP_EOL;
-        return $message;
     }
 }
