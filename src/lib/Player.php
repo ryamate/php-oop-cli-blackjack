@@ -112,7 +112,7 @@ class Player
     /**
      * 1枚カードを手札に加える
      *
-     * @param array<array<string,string|int>> $card
+     * @param array<int,array<string,int|string>> $card
      * @return void
      */
     public function addACardToHand(array $card): void

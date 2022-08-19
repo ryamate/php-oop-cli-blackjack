@@ -1,67 +1,82 @@
 @startuml Blackjack
 
-class Main {
+class Game {
+  -array<int,Player> players
+  -Dealer dealer
+  +__construct()
+  +play()
+  -set()
+  -start()
+  -action()
+  -result()
+  -end()
 }
 
-class Game {
-  -Player player
-  -Dealer dealer
-  -array npc
-  +__construct()
-  +getDeck()
-  +getPlayer()
-  +getDealer()
-  +start()
-  -displayStartMessage()
-  -displayInputErrorMessage()
-  -displayLoseByBurstMessage()
-  -displayWinByBurstMessage()
-  -displayProgressMessage()
-  -displayStandMessage()
-  -displayCardsDrawnByDealer()
-  -displayResultMessage()
-
+class Message {
+  +getSettingMessage()
+  +getInputNumOfPlayerMessage()
+  +getSettingInputErrorMessage()
+  +getStartMessage()
+  +getFirstHandMessage()
+  +getDealerFirstHandMessage()
+  +getLoseByBurstMessage()
+  +getProgressMessage()
+  +getProgressQuestionMessage()
+  +getCardDrawnMessage()
+  +getInputErrorMessage()
+  +getScoreTotalResultMessage()
+  +getStandMessage()
+  +getDealerBurstMessage()
+  +getWinByBurstMessage()
+  +getResultMessage()
+  +getEndMessage()
 }
 
 class Player {
   -string name
-  -array hand
+  -array<int,array<string,int|string>> hand
   -int scoreTotal
   -int countAce
   -string status
   +__construct()
+  +getName()
   +getHand()
   +getScoreTotal()
   +getCountAce()
   +getStatus()
-  -calcScoreTotal()
+  +action()
+  #selectHitOrStand()
+  +addACardToHand()
+  +calcScoreTotal()
   -calcAceScore()
   +changeStatus()
 }
 
 class Dealer {
   -NUM_OF_FIRST_HAND
-  -Deck deck
   -string name
   -array hand
   -int scoreTotal
   -int countAce
   -string status
+  -Deck deck
   +__construct()
-  +getDeck()
   +dealOutFirstHand()
   +dealOneCard()
   +checkBurst()
   +judgeWinOrLose()
-  +drawAfterAllPlayerStand()
-}
-
-class NonPlayerCharacter {
+  -hasStand()
+  -compareScoreTotal()
+  +action()
   +selectHitOrStand()
 }
 
+class NonPlayerCharacter {
+  #selectHitOrStand()
+}
+
 class Deck {
-  -array deck
+  -array<int,array<string,int|string>> deck
   +__construct()
   +getDeck()
   +initDeck()
@@ -74,10 +89,13 @@ class Card {
   +createNewDeck()
 }
 
-Main -- Game
 Game -- Player
 Game -- NonPlayerCharacter
 Game -- Dealer
+Game -- Message
+Message -- Player
+Message -- Dealer
+Dealer -- Player
 Dealer -- Deck
 Deck -- Card
 
