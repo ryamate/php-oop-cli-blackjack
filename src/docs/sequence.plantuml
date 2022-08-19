@@ -1,11 +1,12 @@
 @startuml Blackjack
 participant Main order 10
 participant Game order 20
-participant Dealer order 30
-participant Player order 40 #LightBlue
-participant NPC order 45 #GreenYellow
-participant Deck order 50
-participant Card order 60
+participant Message order 30
+participant Dealer order 40
+participant Player order 50 #LightBlue
+participant NPC order 60 #GreenYellow
+participant Deck order 70
+participant Card order 80
 
 skinparam responseMessageBelowArrow true
 
@@ -25,10 +26,10 @@ group #LightGoldenRodYellow Game を new する
   activate Player #LightBlue
 end
 
-group #LightGoldenRodYellow ブラックジャックの設定をする
+group #LightGoldenRodYellow ゲームの設定をする
   Main -> Game : ブラックジャックの\n設定をする
-  Game -> Game : プレイヤー数を決める(メッセージ表示)
-  note over Game
+  Game -> Message : プレイヤー数を決める(メッセージ表示)
+  note over Message
   ブラックジャックの設定をします。
   プレイヤーの人数を選んでください。（1, 2, 3）
   end note
@@ -37,7 +38,7 @@ group #LightGoldenRodYellow ブラックジャックの設定をする
   activate NPC #GreenYellow
 end
 
-group #LightGoldenRodYellow ブラックジャックゲームをスタートする
+group #LightGoldenRodYellow ゲームを開始する
   Main -> Game : ブラックジャックを\n開始する
 
   Game -> Dealer : デッキをシャッフルする
@@ -52,9 +53,9 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
   Dealer -> Deck : デッキから ディーラー に手札2枚を配る
   Deck --> Dealer
 
-  Game ->  Game : ブラックジャックの開始時の\nメッセージを表示する
+  Game ->  Message : ブラックジャックの開始時の\nメッセージを表示する
 
-  note over Game
+  note over Message
     ブラックジャックを開始します。
     あなたの引いたカードはハートの7です。
     あなたの引いたカードはクラブの8です。
@@ -62,6 +63,10 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
     ディーラーの引いた2枚目のカードはわかりません。
     あなたの現在の得点は15です。カードを引きますか？（Y/N）
   end note
+
+end
+
+group #LightGoldenRodYellow ゲームを進行する
 
   group #LightBlue Player(あなた)は Hit か Stand かを選択する
     alt Y (Hit)
@@ -75,7 +80,9 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
 
       alt カードの合計値が 21 を超えていない場合
         Dealer --> Game :
-        note over Game
+
+        Game ->  Message : メッセージを表示する
+        note over Message
           あなたの引いたカードはスペードの５です。
           あなたの現在の得点は20です。カードを引きますか？（Y/N）
         end note
@@ -86,7 +93,8 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
       end
     else N (Stand)
 
-      note over Game
+      Game ->  Message : メッセージを表示する
+      note over Message
         あなたの引いた2枚目のカードはダイヤの2でした。
         あなたの現在の得点は12です。
       end note
@@ -94,7 +102,8 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
       Game -> Player : ステータスを\n「stand」に変更する
 
     else 再入力
-      note over Game
+      Game ->  Message : メッセージを表示する
+      note over Message
         Y/N で入力してください。カードを引きますか？（Y/N）
       end note
       Game -> Game : 再入力
@@ -102,7 +111,8 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
 
     alt Burst (プレイヤーのカードの合計値が 21 を超えていた場合)
 
-      note over Game #Yellow
+      Game ->  Message : メッセージを表示する
+      note over Message #Yellow
         あなたの引いたカードはダイヤのJです。
         あなたの現在の得点は25です。
         合計値が21を超えたので、あなたの負けです。
@@ -122,7 +132,8 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
 
       alt カードの合計値が 21 を超えていない場合
         Dealer --> Game :
-        note over Game
+        Game ->  Message : メッセージを表示する
+        note over Message
           NPC の引いたカードはスペードの５です。
           NPC の現在の得点は20です。カードを引きますか？（Y/N）
         end note
@@ -133,7 +144,8 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
       end
     else N (Stand)
 
-      note over Game
+      Game ->  Message : メッセージを表示する
+      note over Message
         NPC の引いた2枚目のカードはダイヤの2でした。
         NPC の現在の得点は12です。
       end note
@@ -141,15 +153,16 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
       Game -> Player : ステータスを\n「stand」に変更する
 
     else 再入力
-      note over Game
+      Game ->  Message : メッセージを表示する
+      note over Message
         Y/N で入力してください。カードを引きますか？（Y/N）
       end note
       Game -> Game : 再入力
     end
 
     alt Burst (プNPC カードの合計値が 21 を超えていた場合)
-
-      note over Game #Yellow
+      Game ->  Message : メッセージを表示する
+      note over Message #Yellow
         NPC の引いたカードはダイヤのJです。
         NPC の現在の得点は25です。
         合計値が21を超えたので、 NPC の負けです。
@@ -157,6 +170,9 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
     end
   end
 
+end
+
+group #LightGoldenRodYellow 結果を判定する
   alt Stand (カードの合計値が 21 以下) のプレイヤーが残っていた場合
 
       Game -> Dealer : ディーラーは自分のカードの合計値が\n 17 以上になるまで引き続ける
@@ -164,14 +180,16 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
       Dealer -> Deck : 1枚カードを引く
       Deck --> Dealer : 1枚カードを返す
       Dealer -> Dealer : 得点を計算する
+      Dealer -> Dealer : ステータスを変更する
+      Dealer ->  Message : メッセージを表示する
+      note over Message
+        ディーラーの引いたカードはハートのKです。
+      end note
     end
 
     alt Burst (ディーラーのカードの合計値が 21 を超えていた場合)
-
-      note over Game
-        ディーラーの引いたカードはハートのKです。
-      end note
-      note over Game #Yellow
+      Dealer ->  Message : メッセージを表示する
+      note over Message #Yellow
         ディーラーの得点は22です。
         合計値が21を超えたので、ディーラーはバーストしました。
         あなたの勝ちです！
@@ -180,7 +198,7 @@ group #LightGoldenRodYellow ブラックジャックゲームをスタートす�
 
     else ディーラーのカードの合計値が 21 を超えていない場合
 
-      Game -> Dealer : 勝敗を判定する
+      Dealer -> Dealer : 勝敗を判定する
       Dealer -> Dealer : スコアを取得する
       Dealer -> Player : スコアを取得する
       Dealer -> Player : ステータスを\nwin, lose, draw に変更する
