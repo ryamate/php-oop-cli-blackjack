@@ -2,8 +2,27 @@
 
 namespace Blackjack;
 
-class Player
+/**
+ * プレイヤークラス
+ */
+abstract class Player
 {
+    /**
+     * プレイヤーのタイプ別にアクションを選択する
+     *
+     * @param Deck $deck
+     * @param Dealer $dealer
+     * @return void
+     */
+    abstract public function action(Deck $deck, Dealer $dealer): void;
+
+    /**
+     * ヒットかスタンドを Y/N で選択する
+     *
+     * @return string
+     */
+    abstract public function selectHitOrStand(): string;
+
     /**
      * コンストラクタ
      *
@@ -53,16 +72,6 @@ class Player
     }
 
     /**
-     * 引いた A の枚数を返す
-     *
-     * @return int $this->countAce 得点
-     */
-    public function getCountAce(): int
-    {
-        return $this->countAce;
-    }
-
-    /**
      * プレイヤーの状態を返す
      *
      * @return string $this->status プレイヤーの状態
@@ -70,43 +79,6 @@ class Player
     public function getStatus(): string
     {
         return $this->status;
-    }
-
-    /**
-     * 選択したアクション（ヒットかスタンド）により進行する
-     *
-     * @param Dealer $dealer
-     * @return void
-     */
-    public function action(Dealer $dealer): void
-    {
-        $message = '';
-        while ($this->getStatus() === 'hit') {
-            echo Message::getProgressMessage($this);
-            echo Message::getProgressQuestionMessage();
-            $inputYesOrNo = $this->selectHitOrStand();
-
-            if ($inputYesOrNo === 'Y') {
-                $dealer->dealOneCard($this);
-                $dealer->checkBurst($this);
-                $message = Message::getCardDrawnMessage($this);
-            } elseif ($inputYesOrNo === 'N') {
-                $this->changeStatus('stand');
-                $message = PHP_EOL;
-            }
-            echo $message;
-        }
-    }
-
-    /**
-     * ヒットかスタンドを Y/N で選択する（標準入力を求める）
-     *
-     * @return string
-     */
-    protected function selectHitOrStand(): string
-    {
-        $inputYesOrNo = trim(fgets(STDIN));
-        return $inputYesOrNo;
     }
 
     /**

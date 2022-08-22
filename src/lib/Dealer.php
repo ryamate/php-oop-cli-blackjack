@@ -2,66 +2,41 @@
 
 namespace Blackjack;
 
-require_once('Player.php');
 require_once('Deck.php');
+require_once('Player.php');
 
-use Blackjack\Player;
 use Blackjack\Deck;
+use Blackjack\Player;
 
 class Dealer extends Player
 {
     private const NUM_OF_FIRST_HAND = 2;
 
     /**
-     * コンストラクタ
-     *
-     * @param string $name プレイヤー名
-     * @param array<int,array<string,int|string>> $hand 手札
-     * @param int $scoreTotal プレイヤーの現在の得点
-     * @param int $countAce プレイヤーの引いた A の枚数
-     * @param string $status プレイヤーの状態
-     * @param Deck $deck
-     */
-    public function __construct(
-        private string $name,
-        private array $hand = [],
-        private int $scoreTotal = 0,
-        private int $countAce = 0,
-        private string $status = 'hit',
-        private ?Deck $deck = null,
-    ) {
-        parent::__construct($name, $hand, $scoreTotal, $countAce, $status);
-        $this->deck = $deck ?? new Deck();
-        $this->deck->initDeck();
-    }
-
-    /**
      * 初めの手札2枚を配る
      *
+     * @param Deck $deck
      * @param Player $player
-     * @return Player $player
      */
-    public function dealOutFirstHand(Player $player): Player
+    public function dealOutFirstHand(Deck $deck, Player $player): void
     {
         for ($i = 1; $i <= self::NUM_OF_FIRST_HAND; $i++) {
-            $player = $this->dealOneCard($player);
+            $this->dealOneCard($deck, $player);
         }
-        return $player;
     }
 
     /**
      * カードを1枚配る（デッキからカードを1枚引いて、プレイヤーの手札に加える）
      *
+     * @param Deck $deck
      * @param Player $player
-     * @return Player $player
      */
-    public function dealOneCard(Player $player): Player
+    public function dealOneCard(Deck $deck, Player $player): void
     {
-        $cardDrawn = array_slice($this->deck->getDeck(), 0, 1);
-        $this->deck->takeACard();
+        $cardDrawn = array_slice($deck->getDeck(), 0, 1);
+        $deck->takeACard();
         $player->addACardToHand($cardDrawn);
         $player->calcScoreTotal();
-        return $player;
     }
 
     /**
@@ -82,15 +57,16 @@ class Dealer extends Player
     /**
      * 勝敗を判定する
      *
+     * @param Deck $deck
      * @param array<int,Player> $players
      * @return void
      */
-    public function judgeWinOrLose(array $players): void
+    public function judgeWinOrLose(Deck $deck, array $players): void
     {
         echo Message::getStandMessage($this);
 
         if ($this->hasStand($players)) {
-            $this->action($this);
+            $this->action($deck, $this);
 
             $messages = [];
             $messages[] = Message::getScoreTotalResultMessage($this);
@@ -159,10 +135,11 @@ class Dealer extends Player
     /**
      * 選択したアクション（ヒットかスタンド）により進行する
      *
+     * @param Deck $deck
      * @param Dealer $dealer
      * @return void
      */
-    public function action(Dealer $dealer): void
+    public function action(Deck $deck, Dealer $dealer): void
     {
         $message = '';
         while ($this->getStatus() === 'hit') {
@@ -170,7 +147,7 @@ class Dealer extends Player
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
-                $dealer->dealOneCard($dealer);
+                $dealer->dealOneCard($deck, $dealer);
                 $dealer->checkBurst($dealer);
                 $message = Message::getCardDrawnMessage($dealer);
             } elseif ($inputYesOrNo === 'N') {
