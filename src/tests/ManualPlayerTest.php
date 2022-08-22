@@ -2,26 +2,24 @@
 
 namespace Blackjack\Tests;
 
-require_once(__DIR__ . '/../lib/Player.php');
+require_once(__DIR__ . '/../lib/ManualPlayer.php');
+require_once(__DIR__ . '/../lib/AutoPlayer.php');
 require_once(__DIR__ . '/../lib/Card.php');
 
 use PHPUnit\Framework\TestCase;
-use Blackjack\Player;
-use Blackjack\Card;
+use Blackjack\ManualPlayer;
 
 class PlayerTest extends TestCase
 {
     public function testGetName(): void
     {
-        $player = new Player('あなた');
+        $player = new ManualPlayer('あなた');
         $this->assertSame('あなた', $player->getName());
-        $nPC1 = new Player('NPC1');
-        $this->assertSame('NPC1', $nPC1->getName());
     }
 
     public function testGetHand(): void
     {
-        $player = new Player('あなた', [
+        $player = new ManualPlayer('あなた', [
             ['suit' => 'スペード', 'num' => '2', 'score' => 2],
             ['suit' => 'スペード', 'num' => '3', 'score' => 3],
         ]);
@@ -36,31 +34,23 @@ class PlayerTest extends TestCase
 
     public function testGetScoreTotal(): void
     {
-        $player = new Player('あなた');
+        $player = new ManualPlayer('あなた');
         $this->assertSame(0, $player->getScoreTotal());
-        $nPC1 = new Player('NPC1', [], 21, 1, 'stand');
-        $this->assertSame(21, $nPC1->getScoreTotal());
-    }
-
-    public function testGetCountAce(): void
-    {
-        $player = new Player('あなた');
-        $this->assertSame(0, $player->getCountAce());
-        $nPC1 = new Player('NPC1', [], 21, 1, 'stand');
-        $this->assertSame(1, $nPC1->getCountAce());
+        $player2 = new ManualPlayer('きみ', [], 21, 1, 'stand');
+        $this->assertSame(21, $player2->getScoreTotal());
     }
 
     public function testGetStatus(): void
     {
-        $player = new Player('あなた');
+        $player = new ManualPlayer('あなた');
         $this->assertSame('hit', $player->getStatus());
-        $nPC1 = new Player('NPC1', [], 21, 1, 'stand');
-        $this->assertSame('stand', $nPC1->getStatus());
+        $player2 = new ManualPlayer('きみ', [], 21, 1, 'stand');
+        $this->assertSame('stand', $player2->getStatus());
     }
 
     public function testAddACardToHand(): void
     {
-        $player = new Player('あなた', [
+        $player = new ManualPlayer('あなた', [
             ['suit' => 'スペード', 'num' => '2', 'score' => 2],
             ['suit' => 'スペード', 'num' => '3', 'score' => 3],
         ]);
@@ -79,7 +69,7 @@ class PlayerTest extends TestCase
 
     public function testCalcScoreTotal(): void
     {
-        $player = new Player('あなた', [
+        $player = new ManualPlayer('あなた', [
             ['suit' => 'スペード', 'num' => 'A', 'score' => 11],
             ['suit' => 'スペード', 'num' => '3', 'score' => 3],
         ]);
@@ -107,7 +97,7 @@ class PlayerTest extends TestCase
 
     public function testChangeStatus(): void
     {
-        $player = new Player('あなた');
+        $player = new ManualPlayer('あなた');
         $player->changeStatus('burst');
         $this->assertSame('burst', $player->getStatus());
     }
