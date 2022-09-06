@@ -3,8 +3,8 @@ participant Main order 10
 participant Game order 20
 participant Message order 30
 participant Dealer order 40
-participant Player order 50 #LightBlue
-participant NPC order 60 #GreenYellow
+participant Player order 50 #AliceBlue
+participant NPC order 60 #LavenderBlush
 participant Deck order 70
 participant Card order 80
 
@@ -23,7 +23,7 @@ group #LightGoldenRodYellow Game を new する
   deactivate Card
 
   Game -> Player : Player を new する
-  activate Player #LightBlue
+  activate Player #AliceBlue
 end
 
 group #LightGoldenRodYellow ゲームの設定をする
@@ -35,7 +35,7 @@ group #LightGoldenRodYellow ゲームの設定をする
   end note
 
   Game -> NPC : 決めた人数の NPC を new する
-  activate NPC #GreenYellow
+  activate NPC #LavenderBlush
 end
 
 group #LightGoldenRodYellow ゲームを開始する
@@ -68,7 +68,7 @@ end
 
 group #LightGoldenRodYellow ゲームを進行する
 
-  group #LightBlue Player(あなた)は Hit か Stand かを選択する
+  group #AliceBlue Player(あなた)は Hit か Stand かを選択する
     alt Y (Hit)
       Game -> Player : プレイヤーは1枚カードを引く
       Player -> Deck : 1枚カードを引く
@@ -120,7 +120,7 @@ group #LightGoldenRodYellow ゲームを進行する
     end
   end
 
-  group #GreenYellow NPC(NPC1, NPC2)がいれば Hit か Stand かを選択する（自動）
+  group #LavenderBlush NPC(NPC1, NPC2)がいれば Hit か Stand かを選択する（自動）
     alt Y (Hit)
       Game -> NPC : NPC は1枚カードを引く
       NPC -> Deck : 1枚カードを引く

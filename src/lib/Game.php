@@ -4,6 +4,7 @@ namespace Blackjack;
 
 require_once('Deck.php');
 require_once('Player.php');
+require_once('DealerPlayer.php');
 require_once('ManualPlayer.php');
 require_once('AutoPlayer.php');
 require_once('Dealer.php');
@@ -11,6 +12,7 @@ require_once('Message.php');
 
 use Blackjack\Deck;
 use Blackjack\Player;
+use Blackjack\DealerPlayer;
 use Blackjack\ManualPlayer;
 use Blackjack\AutoPlayer;
 use Blackjack\Dealer;
@@ -33,7 +35,7 @@ class Game
         private array $players = [],
     ) {
         $this->deck = $deck ?? new Deck();
-        $this->dealer = $dealer ?? new Dealer('ディーラー');
+        $this->dealer = $dealer ?? new Dealer(new DealerPlayer('ディーラー'));
         $this->players[] =  new ManualPlayer('あなた');
     }
 
@@ -88,14 +90,14 @@ class Game
             $this->dealer->dealOutFirstHand($this->deck, $player);
         }
         unset($player);
-        $this->dealer->dealOutFirstHand($this->deck, $this->dealer);
+        $this->dealer->dealOutFirstHand($this->deck, $this->dealer->getDealerPlayer());
 
         $startMessage = Message::getStartMessage();
         foreach ($this->players as $player) {
             $startMessage .= Message::getFirstHandMessage($player);
         }
         unset($player);
-        $startMessage .= Message::getDealerFirstHandMessage($this->dealer);
+        $startMessage .= Message::getDealerFirstHandMessage($this->dealer->getDealerPlayer());
         echo $startMessage;
     }
 
