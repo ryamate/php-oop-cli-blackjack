@@ -1,8 +1,9 @@
 @startuml Blackjack
 
 class Game {
-  -array<int,Player> players
+  -Deck deck
   -Dealer dealer
+  -array<int,Player> players
 
   +__construct()
   +play()
@@ -29,6 +30,20 @@ class Card {
   +createNewDeck()
 }
 
+class Dealer {
+  -NUM_OF_FIRST_HAND
+  -DealerPlayer dealerPlayer
+
+  +__construct()
+  +getDealerPlayer()
+  +dealOutFirstHand()
+  +dealOneCard()
+  +checkBurst()
+  +judgeWinOrLose()
+  -hasStand()
+  -compareScoreTotal()
+}
+
 abstract Player {
   -string name
   -array<int,array<string,int|string>> hand
@@ -50,16 +65,7 @@ abstract Player {
   +changeStatus()
 }
 
-class Dealer {
-  -NUM_OF_FIRST_HAND
-
-  +dealOutFirstHand()
-  +dealOneCard()
-  +checkBurst()
-  +judgeWinOrLose()
-  -hasStand()
-  -compareScoreTotal()
-
+class DealerPlayer {
   +action()
   +selectHitOrStand()
 }
@@ -101,12 +107,13 @@ class Message {
 Game -- Deck
 Deck *-- Card
 Game -- Dealer
-Game -- ManualPlayer
-Game -- AutoPlayer
-Dealer --|> Player
-ManualPlayer --|> Player
-AutoPlayer --|> Player
-Game --- Message
-
+Dealer *-- DealerPlayer
+Game -- Player
+Game --- ManualPlayer
+Game --- AutoPlayer
+Player <|-- DealerPlayer
+Player <|-- ManualPlayer
+Player <|-- AutoPlayer
+Game -- Message
 
 @enduml

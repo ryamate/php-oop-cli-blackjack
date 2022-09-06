@@ -75,13 +75,13 @@ class Message
     /**
      * ディーラーが最初に引いたカードについてのメッセージを返す
      *
-     * @param Dealer $dealer
+     * @param DealerPlayer $dealerPlayer
      * @return string $message
      */
-    public static function getDealerFirstHandMessage(Dealer $dealer): string
+    public static function getDealerFirstHandMessage(DealerPlayer $dealerPlayer): string
     {
         $message = '';
-        $dealersFirstCard = $dealer->getHand()[0];
+        $dealersFirstCard = $dealerPlayer->getHand()[0];
         $message .= 'ディーラーの引いたカードは' .
             $dealersFirstCard['suit'] . 'の' . $dealersFirstCard['num'] . 'です。' . PHP_EOL;
         $message .= 'ディーラーの引いた2枚目のカードはわかりません。' . PHP_EOL . PHP_EOL;
@@ -163,11 +163,12 @@ class Message
     /**
      * これ以上カードを引かないと宣言した後のメッセージを返す
      *
+     * @param DealerPlayer $dealerPlayer
      * @return string $message
      */
-    public static function getStandMessage(Dealer $dealer): string
+    public static function getStandMessage(DealerPlayer $dealerPlayer): string
     {
-        $dealersHand = $dealer->getHand();
+        $dealersHand = $dealerPlayer->getHand();
         $dealersSecondCard = end($dealersHand);
         $message = 'ディーラーの引いた2枚目のカードは' .
             $dealersSecondCard['suit'] . 'の' .
