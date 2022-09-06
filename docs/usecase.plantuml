@@ -1,0 +1,24 @@
+@startuml Blackjack
+skinparam actorStyle awesome
+left to right direction
+actor Dealer as d
+actor Player <<Manual>> as mp #AliceBlue
+actor Player1 <<Auto>> as ap1 #LavenderBlush
+actor Player2 <<Auto>> as ap2 #LavenderBlush
+
+rectangle Blackjack {
+  usecase "ゲームスタートする" as UC1
+  usecase "デッキからカードを引く" as UC2
+  usecase "勝敗を判定する" as UC3
+  usecase "ゲームを終了する" as UC4
+  UC1 --> UC2
+  UC2 --> UC3
+  UC3 --> UC4
+}
+  mp --> UC2
+  ap1 -> UC2
+  d -> UC2
+  UC2 <-- ap2
+  d --> UC3
+
+@enduml
