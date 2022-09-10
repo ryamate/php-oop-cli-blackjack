@@ -226,7 +226,6 @@ group #LightGoldenRodYellow 結果を判定する
   end
 end
 
-
 group #LightGoldenRodYellow チップを計算する
     Game -> Dealer : ディーラーはチップを計算する
     Dealer -> mp : Player の合計チップ数を変更する
@@ -253,7 +252,28 @@ group #LightGoldenRodYellow チップを計算する
     end
 end
 
-Game --> Main : ゲーム終了
+group #LightGoldenRodYellow ゲームを続けるか、やめるかを選択する
+
+    alt チップ残高がある場合
+      Game ->  Message : メッセージを表示する
+      note over Message #Yellow
+        ブラックジャックゲームを続けますか？（Y/N）
+      end note
+    else チップ残高が 0 の場合
+      Game ->  Message : メッセージを表示する
+      note over Message #Yellow
+        あなたは、チップの残高がなくなりました。
+      end note
+    end
+end
+alt ゲーム続行
+  note over Game
+    次のゲームへ
+    （「ベットする額を決める」まで戻る）
+  end note
+else ゲーム終了
+  Game --> Main : ゲーム終了
+end
   deactivate Dealer
   deactivate mp
   deactivate ap
