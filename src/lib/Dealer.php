@@ -18,9 +18,14 @@ class Dealer
      * コンストラクタ
      *
      * @param DealerPlayer $dealerPlayer
+     * @param Judge $judge
+     * @param ChipCalculator $chipCalculator
      */
-    public function __construct(private DealerPlayer $dealerPlayer)
-    {
+    public function __construct(
+        private DealerPlayer $dealerPlayer,
+        private Judge $judge,
+        private ChipCalculator $chipCalculator
+    ) {
     }
 
     /**
@@ -31,6 +36,26 @@ class Dealer
     public function getDealerPlayer(): DealerPlayer
     {
         return $this->dealerPlayer;
+    }
+
+    /**
+     * Judge を返す
+     *
+     * @return Judge $this->judge
+     */
+    public function getJudge(): Judge
+    {
+        return $this->judge;
+    }
+
+    /**
+     * ChipCalculator を返す
+     *
+     * @return ChipCalculator $this->chipCalculator
+     */
+    public function getChipCalculator(): ChipCalculator
+    {
+        return $this->chipCalculator;
     }
 
     /**
@@ -58,98 +83,5 @@ class Dealer
         $deck->takeACard();
         $player->addACardToHand($cardDrawn);
         $player->calcScoreTotal();
-    }
-
-    /**
-     * カードの合計値が 21 を超えているかを判定する
-     *
-     * @param Player $player
-     * @return bool 21 を超えたら true
-     */
-    public function checkBurst(Player $player): bool
-    {
-        if ($player->getScoreTotal() > 21) {
-            $player->changeStatus('burst');
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 勝敗を判定する
-     *
-     * @param Deck $deck
-     * @param array<int,Player> $players
-     * @return void
-     */
-    public function judgeWinOrLose(Deck $deck, array $players): void
-    {
-        echo Message::getStandMessage($this->dealerPlayer);
-
-        if ($this->hasStand($players)) {
-            $this->dealerPlayer->action($deck, $this);
-
-            $messages = [];
-            $messages[] = Message::getScoreTotalResultMessage($this->dealerPlayer);
-
-            if ($this->dealerPlayer->getStatus() === 'burst') {
-                $messages[] = Message::getDealerBurstMessage();
-                foreach ($players as $player) {
-                    if ($player->getStatus() === 'stand') {
-                        $player->changeStatus('win');
-                        $messages[] = Message::getWinByBurstMessage($player);
-                    }
-                }
-            } else {
-                foreach ($players as $player) {
-                    if ($player->getStatus() === 'stand') {
-                        $result = $this->compareScoreTotal($player);
-                        $player->changeStatus($result);
-                        $messages[] = Message::getResultMessage($player);
-                    }
-                }
-            }
-            foreach ($messages as $message) {
-                echo $message;
-            }
-            unset($message);
-        }
-    }
-
-    /**
-     * スタンドのプレイヤーがいるかについて、 bool を返す
-     *
-     * @param array<int,Player> $players
-     * @return bool
-     */
-    private function hasStand(array $players): bool
-    {
-        foreach ($players as $player) {
-            if ($player->getStatus() === 'stand') {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * プレイヤーとディーラーの得点を比較して、勝敗を返す
-     *
-     * @param Player $player
-     * @return string $result
-     */
-    private function compareScoreTotal(Player $player): string
-    {
-        $result = '';
-        $playerScoreTotal = $player->getScoreTotal();
-        $dealerScoreTotal = $this->dealerPlayer->getScoreTotal();
-        if ($playerScoreTotal > $dealerScoreTotal) {
-            $result = 'win';
-        } elseif ($playerScoreTotal < $dealerScoreTotal) {
-            $result = 'lose';
-        } elseif ($playerScoreTotal === $dealerScoreTotal) {
-            $result = 'draw';
-        }
-        return $result;
     }
 }

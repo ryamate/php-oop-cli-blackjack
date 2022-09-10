@@ -3,10 +3,10 @@
 namespace Blackjack;
 
 require_once('Player.php');
-require_once('Dealer.php');
+require_once('DealerPlayer.php');
 
 use Blackjack\Player;
-use Blackjack\Dealer;
+use Blackjack\DealerPlayer;
 
 /**
  * メッセージクラス
@@ -42,6 +42,22 @@ class Message
     {
         return '1, 2, 3 で入力してください。' . PHP_EOL;
     }
+
+    /**
+     * Y/N 以外の値が入力された時のメッセージを返す
+     *
+     * @param Player $player
+     * @return string $message
+     */
+    public static function getPlaceYourBetsMessage(Player $player): string
+    {
+        $message = '';
+        $message .= $player->getName() . 'の持っているチップは' . $player->getChips() . 'ドルです。' . PHP_EOL
+            . 'ベットする額を決めてください。（1〜1000ドル）' . PHP_EOL;
+        return $message;
+    }
+
+
 
     /**
      * ブラックジャックの開始時メッセージを返す
@@ -209,11 +225,11 @@ class Message
     {
         $message = '';
         $playerName = $player->getName();
-        if ($player->getStatus() === 'win') {
+        if ($player->getStatus() === Player::WIN) {
             $message = $playerName . 'の勝ちです！' . PHP_EOL;
-        } elseif ($player->getStatus() === 'lose') {
+        } elseif ($player->getStatus() === Player::LOSE) {
             $message = $playerName . 'の負けです…' . PHP_EOL;
-        } elseif ($player->getStatus() === 'draw') {
+        } elseif ($player->getStatus() === Player::DRAW) {
             $message = $playerName . 'は引き分けです。' . PHP_EOL;
         }
         return $message;

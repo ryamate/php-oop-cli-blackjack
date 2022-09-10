@@ -2,7 +2,7 @@
 
 namespace Blackjack;
 
-require_once('Game.php');
+require_once('lib/Game.php');
 
 $game = new Game();
 $game->play();

@@ -1,16 +1,22 @@
 @startuml Blackjack
 
 class Game {
+  -CONTINUE
+  -STOP
   -Deck deck
   -Dealer dealer
   -array<int,Player> players
+  -string status
 
   +__construct()
   +play()
   -set()
+  -placeYourBets()
   -start()
   -action()
   -result()
+  -calcChips()
+  -selectContinueOrStop()
   -end()
 }
 
@@ -33,29 +39,41 @@ class Card {
 class Dealer {
   -NUM_OF_FIRST_HAND
   -DealerPlayer dealerPlayer
+  -Judge judge
+  -ChipCalculator chipCalculator
 
   +__construct()
   +getDealerPlayer()
+  +getJudge()
+  +getChipCalculator()
   +dealOutFirstHand()
   +dealOneCard()
+}
+
+class Judge {
   +checkBurst()
   +judgeWinOrLose()
   -hasStand()
   -compareScoreTotal()
 }
 
+class ChipCalculator {
+  +calcChips()
+}
+
 abstract Player {
   -string name
+  -int chips
+  -int bets
   -array<int,array<string,int|string>> hand
   -int scoreTotal
   -int countAce
   -string status
 
-  +{abstract} action()
-  +{abstract} selectHitOrStand()
-
   +__construct()
   +getName()
+  +getChips()
+  +getBets()
   +getHand()
   +getScoreTotal()
   +getStatus()
@@ -63,6 +81,19 @@ abstract Player {
   +calcScoreTotal()
   -calcAceScore()
   +changeStatus()
+  +changeBets()
+  +changeChips()
+  +reset()
+}
+
+interface PlayerAction {
+  +action()
+  +selectHitOrStand()
+}
+
+interface PlayerBet {
+  +bet()
+  +selectBets()
 }
 
 class DealerPlayer {
@@ -71,19 +102,29 @@ class DealerPlayer {
 }
 
 class ManualPlayer {
+  +bet()
+  +selectBets()
   +action()
   +selectHitOrStand()
 }
 
 class AutoPlayer {
+  +bet()
+  +selectBets()
   +action()
   +selectHitOrStand()
+}
+
+class Validator <<trait>> {
+  +validateInputBets()
 }
 
 class Message {
   +getSettingMessage()
   +getInputNumOfPlayerMessage()
   +getSettingInputErrorMessage()
+
+  +getPlaceYourBetsMessage()
 
   +getStartMessage()
   +getFirstHandMessage()
@@ -104,16 +145,27 @@ class Message {
   +getEndMessage()
 }
 
-Game -- Deck
+Game *-- Deck
 Deck *-- Card
-Game -- Dealer
+Game *-- Dealer
+Deck - Dealer
+Dealer - Player
+Dealer *-- Judge
+Dealer *-- ChipCalculator
 Dealer *-- DealerPlayer
 Game -- Player
 Game --- ManualPlayer
 Game --- AutoPlayer
-Player <|-- DealerPlayer
-Player <|-- ManualPlayer
-Player <|-- AutoPlayer
+Player <|--- DealerPlayer
+Player <|--- ManualPlayer
+Player <|--- AutoPlayer
+PlayerAction <|.. DealerPlayer
+PlayerAction <|.. ManualPlayer
+PlayerAction <|.. AutoPlayer
+PlayerBet <|.. ManualPlayer
+PlayerBet <|.. AutoPlayer
+ManualPlayer -- Validator
+AutoPlayer -- Validator
 Game -- Message
 
 @enduml

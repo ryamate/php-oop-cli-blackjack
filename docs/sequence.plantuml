@@ -1,17 +1,20 @@
 @startuml Blackjack
+
+skinparam responseMessageBelowArrow true
+skinparam actorStyle awesome
+
 participant Main order 10
 participant Game order 20
 participant Message order 30
-participant Dealer order 40
-participant Player order 50 #AliceBlue
-participant NPC order 60 #LavenderBlush
+actor Dealer order 40
+actor "<<Manual>>\nPlayer" as mp order 50 #AliceBlue
+actor "<<Auto>>\nPlayer" as ap order 60 #LavenderBlush
 participant Deck order 70
 participant Card order 80
 
-skinparam responseMessageBelowArrow true
+Main -> Game : Game を new する
 
 group #LightGoldenRodYellow Game を new する
-  Main -> Game : Game を new する
   activate Game
   Game ->  Dealer : Dealer を new する
   activate  Dealer
@@ -22,33 +25,42 @@ group #LightGoldenRodYellow Game を new する
   Card --> Deck : カード52枚を返却する
   deactivate Card
 
-  Game -> Player : Player を new する
-  activate Player #AliceBlue
+  Game -> mp : Player を new する
+  activate mp #AliceBlue
 end
 
+Main -> Game : ブラックジャックを\n開始する
+
 group #LightGoldenRodYellow ゲームの設定をする
-  Main -> Game : ブラックジャックの\n設定をする
   Game -> Message : プレイヤー数を決める(メッセージ表示)
   note over Message
   ブラックジャックの設定をします。
   プレイヤーの人数を選んでください。（1, 2, 3）
   end note
 
-  Game -> NPC : 決めた人数の NPC を new する
-  activate NPC #LavenderBlush
+  Game -> ap : 決めた人数の NPC を new する
+  activate ap #LavenderBlush
+end
+
+group #LightGoldenRodYellow ベットする額を決める
+  Game -> Message : ベットする額を決める(メッセージ表示)
+  note over Message
+  『プレイスユアベット』
+  あなたの持っているチップは100ドルです。
+  ベットする額を決めてください。（1〜1000ドル）
+  end note
+  Game -> mp : Player の ベットする額 を決めた額に変更する
 end
 
 group #LightGoldenRodYellow ゲームを開始する
-  Main -> Game : ブラックジャックを\n開始する
-
   Game -> Dealer : デッキをシャッフルする
   Dealer -> Deck : デッキをシャッフルする
 
   Dealer -> Deck : デッキからプレイヤーに手札2枚を配る
-  Deck --> Player
+  Deck --> mp
 
   Dealer -> Deck : デッキから NPC に手札2枚を配る
-  Deck --> NPC
+  Deck --> ap
 
   Dealer -> Deck : デッキから ディーラー に手札2枚を配る
   Deck --> Dealer
@@ -70,13 +82,13 @@ group #LightGoldenRodYellow ゲームを進行する
 
   group #AliceBlue Player(あなた)は Hit か Stand かを選択する
     alt Y (Hit)
-      Game -> Player : プレイヤーは1枚カードを引く
-      Player -> Deck : 1枚カードを引く
-      Deck --> Player : 1枚カードを返す
-      Player -> Player : 得点を計算する
+      Game -> mp : プレイヤーは1枚カードを引く
+      mp -> Deck : 1枚カードを引く
+      Deck --> mp : 1枚カードを返す
+      mp -> mp : 得点を計算する
 
       Game -> Dealer : ディーラーはバーストか否かチェックする
-      Dealer -> Player : バーストか否かチェックする
+      Dealer -> mp : バーストか否かチェックする
 
       alt カードの合計値が 21 を超えていない場合
         Dealer --> Game :
@@ -87,7 +99,7 @@ group #LightGoldenRodYellow ゲームを進行する
           あなたの現在の得点は20です。カードを引きますか？（Y/N）
         end note
       else Burst (カードの合計値が 21 を超えていた場合)
-        Dealer -> Player : ステータスを\n「burst」に変更する
+        Dealer -> mp : ステータスを\n「burst」に変更する
         Dealer --> Game :
 
       end
@@ -99,7 +111,7 @@ group #LightGoldenRodYellow ゲームを進行する
         あなたの現在の得点は12です。
       end note
 
-      Game -> Player : ステータスを\n「stand」に変更する
+      Game -> mp : ステータスを\n「stand」に変更する
 
     else 再入力
       Game ->  Message : メッセージを表示する
@@ -122,13 +134,13 @@ group #LightGoldenRodYellow ゲームを進行する
 
   group #LavenderBlush NPC(NPC1, NPC2)がいれば Hit か Stand かを選択する（自動）
     alt Y (Hit)
-      Game -> NPC : NPC は1枚カードを引く
-      NPC -> Deck : 1枚カードを引く
-      Deck --> NPC : 1枚カードを返す
-      NPC -> NPC : 得点を計算する
+      Game -> ap : NPC は1枚カードを引く
+      ap -> Deck : 1枚カードを引く
+      Deck --> ap : 1枚カードを返す
+      ap -> ap : 得点を計算する
 
       Game -> Dealer : ディーラーはバーストか否かチェックする
-      Dealer -> NPC : バーストか否かチェックする
+      Dealer -> ap : バーストか否かチェックする
 
       alt カードの合計値が 21 を超えていない場合
         Dealer --> Game :
@@ -138,7 +150,7 @@ group #LightGoldenRodYellow ゲームを進行する
           NPC の現在の得点は20です。カードを引きますか？（Y/N）
         end note
       else Burst (カードの合計値が 21 を超えていた場合)
-        Dealer -> NPC : ステータスを\n「burst」に変更する
+        Dealer -> ap : ステータスを\n「burst」に変更する
         Dealer --> Game :
 
       end
@@ -150,7 +162,7 @@ group #LightGoldenRodYellow ゲームを進行する
         NPC の現在の得点は12です。
       end note
 
-      Game -> Player : ステータスを\n「stand」に変更する
+      Game -> ap : ステータスを\n「stand」に変更する
 
     else 再入力
       Game ->  Message : メッセージを表示する
@@ -200,24 +212,51 @@ group #LightGoldenRodYellow 結果を判定する
 
       Dealer -> Dealer : 勝敗を判定する
       Dealer -> Dealer : スコアを取得する
-      Dealer -> Player : スコアを取得する
-      Dealer -> Player : ステータスを\nwin, lose, draw に変更する
-      Dealer -> NPC : ステータスを\nwin, lose, draw に変更する
+      Dealer -> mp : スコアを取得する
+      Dealer -> mp : ステータスを\nwin, lose, draw に変更する
+      Dealer -> ap : ステータスを\nwin, lose, draw に変更する
 
-
-      note over Game #Yellow
+      Dealer ->  Message : メッセージを表示する
+      note over Message #Yellow
         あなたの勝ちです！
         （NPCの勝ちです！）
         ブラックジャックを終了します。
       end note
     end
-    Game --> Main : ゲーム終了
-  deactivate Game
-  deactivate Dealer
-  deactivate Player
-  deactivate NPC
-  deactivate Deck
   end
 end
 
+
+group #LightGoldenRodYellow チップを計算する
+    Game -> Dealer : ディーラーはチップを計算する
+    Dealer -> mp : Player の合計チップ数を変更する
+
+    alt 勝った人（ステータス → win）
+      Dealer ->  Message : メッセージを表示する
+      note over Message #Yellow
+        勝ったので 5 チップと同額の配当を得られます。
+        あなたのチップ残高は 105 ドルです。
+      end note
+
+    else 負けた人（ステータス → lose）
+      Dealer ->  Message : メッセージを表示する
+      note over Message #Yellow
+        負けたため、チップ 5 ドルは没収されます。
+        あなたのチップ残高は 95 ドルです。
+      end note
+    else 引き分けた人（ステータス → draw）
+      Dealer ->  Message : メッセージを表示する
+      note over Message #Yellow
+        引き分けたため、チップ 5 ドルはそのままです。
+        あなたのチップ残高は 100 ドルです。
+      end note
+    end
+end
+
+Game --> Main : ゲーム終了
+  deactivate Dealer
+  deactivate mp
+  deactivate ap
+  deactivate Deck
+deactivate Game
 @enduml

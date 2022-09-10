@@ -4,11 +4,13 @@ namespace Blackjack;
 
 require_once('Deck.php');
 require_once('Player.php');
+require_once('PlayerAction.php');
 
 use Blackjack\Deck;
 use Blackjack\Player;
+use Blackjack\PlayerAction;
 
-class DealerPlayer extends Player
+class DealerPlayer extends Player implements PlayerAction
 {
     /**
      * 選択したアクション（ヒットかスタンド）により進行する
@@ -20,16 +22,16 @@ class DealerPlayer extends Player
     public function action(Deck $deck, Dealer $dealer): void
     {
         $message = '';
-        while ($this->getStatus() === 'hit') {
+        while ($this->getStatus() === self::HIT) {
             echo Message::getProgressMessage($this);
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
                 $dealer->dealOneCard($deck, $this);
-                $dealer->checkBurst($this);
+                $dealer->getJudge()->checkBurst($this);
                 $message = Message::getCardDrawnMessage($this);
             } elseif ($inputYesOrNo === 'N') {
-                $this->changeStatus('stand');
+                $this->changeStatus(self::STAND);
                 $message = PHP_EOL . PHP_EOL;
             }
             echo $message;
