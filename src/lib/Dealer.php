@@ -12,7 +12,7 @@ use Blackjack\Player;
 
 class Dealer
 {
-    private const NUM_OF_FIRST_HAND = 2;
+    public const NUM_OF_FIRST_HAND = 2;
 
     /**
      * コンストラクタ
@@ -20,11 +20,13 @@ class Dealer
      * @param DealerPlayer $dealerPlayer
      * @param Judge $judge
      * @param ChipCalculator $chipCalculator
+     * @param SpecialRule $specialRule
      */
     public function __construct(
         private DealerPlayer $dealerPlayer,
         private Judge $judge,
-        private ChipCalculator $chipCalculator
+        private ChipCalculator $chipCalculator,
+        private SpecialRule $specialRule
     ) {
     }
 
@@ -56,6 +58,16 @@ class Dealer
     public function getChipCalculator(): ChipCalculator
     {
         return $this->chipCalculator;
+    }
+
+    /**
+     * SpecialRule を返す
+     *
+     * @return SpecialRule $this->specialRule
+     */
+    public function getSpecialRule(): SpecialRule
+    {
+        return $this->specialRule;
     }
 
     /**

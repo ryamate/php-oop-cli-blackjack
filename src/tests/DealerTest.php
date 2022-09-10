@@ -17,6 +17,7 @@ use Blackjack\Judge;
 use Blackjack\ChipCalculator;
 use Blackjack\Deck;
 use Blackjack\ManualPlayer;
+use Blackjack\SpecialRule;
 
 class DealerTest extends TestCase
 {
@@ -28,7 +29,8 @@ class DealerTest extends TestCase
         $dealer = new Dealer(
             new DealerPlayer('ディーラー'),
             new Judge(),
-            new ChipCalculator()
+            new ChipCalculator(),
+            new SpecialRule()
         );
         $dealer->dealOutFirstHand($deck, $player);
 
@@ -44,7 +46,8 @@ class DealerTest extends TestCase
         $dealer = new Dealer(
             new DealerPlayer('ディーラー'),
             new Judge(),
-            new ChipCalculator()
+            new ChipCalculator(),
+            new SpecialRule()
         );
         $dealer->dealOneCard($deck, $player);
 

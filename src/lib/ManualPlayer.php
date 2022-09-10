@@ -57,18 +57,24 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
     public function action(Deck $deck, Dealer $dealer): void
     {
         $message = '';
+        echo Message::getProgressMessage($this);
+        echo Message::getProgressQuestionMessage();
         while ($this->getStatus() === self::HIT) {
-            echo Message::getProgressMessage($this);
-            echo Message::getProgressQuestionMessage();
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
                 $dealer->dealOneCard($deck, $this);
                 $dealer->getJudge()->checkBurst($this);
-                $message = Message::getCardDrawnMessage($this);
+                $message .= Message::getCardDrawnMessage($this);
+                $message .= Message::getProgressMessage($this);
+                $message .= Message::getProgressQuestionMessage();
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
                 $message = PHP_EOL;
+            } elseif (count($this->getHand()) === $dealer::NUM_OF_FIRST_HAND) {
+                $message = $dealer->getSpecialRule()->applySpecialRule($inputYesOrNo, $deck, $dealer, $this);
+            } else {
+                $message .= 'Y/N（DD/SP/SR は、最初に手札が配られたときのみ）を入力してください';
             }
             echo $message;
         }

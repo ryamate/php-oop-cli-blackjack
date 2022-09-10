@@ -10,6 +10,7 @@ require_once('AutoPlayer.php');
 require_once('Dealer.php');
 require_once('Judge.php');
 require_once('ChipCalculator.php');
+require_once('SpecialRule.php');
 require_once('Message.php');
 
 use Blackjack\Deck;
@@ -20,6 +21,7 @@ use Blackjack\AutoPlayer;
 use Blackjack\Dealer;
 use Blackjack\Judge;
 use Blackjack\ChipCalculator;
+use Blackjack\SpecialRule;
 use Blackjack\Message;
 
 /**
@@ -48,7 +50,8 @@ class Game
         $this->dealer = $dealer ?? new Dealer(
             new DealerPlayer('ディーラー'),
             new Judge(),
-            new ChipCalculator()
+            new ChipCalculator(),
+            new SpecialRule()
         );
         $this->players[] =  new ManualPlayer('あなた');
     }
@@ -194,7 +197,8 @@ class Game
             }
         }
         while ($this->status === self::CONTINUE && $inputYesOrNo !== 'Y' && $inputYesOrNo !== 'N') {
-            echo 'ブラックジャックゲームを続けますか？（Y/N）' . PHP_EOL;
+            echo 'ブラックジャックゲームを続けますか？（Y/N）' . PHP_EOL .
+                '👉 ';
             $inputYesOrNo = trim(fgets(STDIN));
 
             if ($inputYesOrNo === 'Y') {

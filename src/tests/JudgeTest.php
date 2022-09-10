@@ -17,6 +17,7 @@ use Blackjack\Judge;
 use Blackjack\ChipCalculator;
 use Blackjack\Deck;
 use Blackjack\ManualPlayer;
+use Blackjack\SpecialRule;
 
 class JudgeTest extends TestCase
 {
@@ -44,7 +45,8 @@ class JudgeTest extends TestCase
                 ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
             ], 20, 0, 'hit'),
             new Judge(),
-            new ChipCalculator()
+            new ChipCalculator(),
+            new SpecialRule()
         );
 
         $players = [];
@@ -66,7 +68,8 @@ class JudgeTest extends TestCase
                 ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
             ], 25, 0, 'burst'),
             new Judge(),
-            new ChipCalculator()
+            new ChipCalculator(),
+            new SpecialRule()
         );
 
         $players = [];

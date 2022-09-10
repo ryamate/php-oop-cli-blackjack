@@ -30,7 +30,8 @@ class Message
      */
     public static function getInputNumOfPlayerMessage(): string
     {
-        return 'プレイヤーの人数を選んでください。（1, 2, 3）' . PHP_EOL;
+        return 'プレイヤーの人数を選んでください。（1, 2, 3）' . PHP_EOL .
+            '🙋‍ ';
     }
 
     /**
@@ -53,7 +54,8 @@ class Message
     {
         $message = '';
         $message .= $player->getName() . 'の持っているチップは' . $player->getChips() . 'ドルです。' . PHP_EOL
-            . 'ベットする額を決めてください。（1〜1000ドル）' . PHP_EOL;
+            . 'ベットする額を決めてください。（1〜1000ドル）' . PHP_EOL .
+            '💲 ';
         return $message;
     }
 
@@ -136,7 +138,8 @@ class Message
      */
     public static function getProgressQuestionMessage(): string
     {
-        return  'カードを引きますか？（Y/N）' . PHP_EOL;
+        return  'カードを引きますか？（Y/N / DD/SP/SR） ※ 特殊ルール（DD: ダブルダウン, SP: スプリット, SR: サレンダー）は、最初に手札が配られたときのみ有効' . PHP_EOL .
+            '👉 ';
     }
 
     /**

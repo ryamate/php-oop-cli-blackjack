@@ -10,6 +10,9 @@ abstract class Player
     public const HIT = 'hit';
     public const STAND = 'stand';
     public const BURST = 'burst';
+    public const DOUBLE_DOWN = 'double down';
+    public const SPLIT = 'split';
+    public const SURRENDER = 'surrender';
     public const WIN = 'win';
     public const LOSE = 'lose';
     public const DRAW = 'draw';
