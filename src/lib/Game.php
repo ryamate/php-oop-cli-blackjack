@@ -57,6 +57,72 @@ class Game
     }
 
     /**
+     * デッキ を返す
+     *
+     * @return Deck
+     */
+    public function getDeck(): Deck
+    {
+        return $this->deck;
+    }
+
+    /**
+     * ディーラー を返す
+     *
+     * @return Dealer
+     */
+    public function getDealer(): Dealer
+    {
+        return $this->dealer;
+    }
+
+    /**
+     * プレイヤーの配列 を返す
+     *
+     * @return  array<int,ManualPlayer|AutoPlayer> $players プレイヤー
+     */
+    public function getPlayers(): array
+    {
+        return $this->players;
+    }
+
+    /**
+     * プレイヤーの配列 にスプリットを宣言したプレイヤーの 2 手目を追加する
+     * - 特殊ルール split で利用
+     *
+     * @param  ManualPlayer|AutoPlayer $playerAsSecondHand スプリットを宣言したプレイヤーの 2 手目
+     */
+    public function addPlayerAsSecondHand(ManualPlayer|AutoPlayer $playerAsSecondHand): void
+    {
+        $count = 0;
+        foreach ($this->players as $player) {
+            ++$count;
+            if ($player->getName() === $playerAsSecondHand->getName()) {
+                array_splice($this->players, $count, 0, [$playerAsSecondHand]);
+                break;
+            }
+        }
+    }
+
+    /**
+     * プレイヤーの配列 にプレイヤーを追加する
+     * 特殊ルール Split で利用するため
+     *
+     * @param  ManualPlayer|AutoPlayer $players プレイヤー
+     */
+    public function removeSplitPlayer(ManualPlayer|AutoPlayer $splitPlayer): void
+    {
+        $count = 0;
+        foreach ($this->players as $player) {
+            if ($player->getName() === $splitPlayer->getName() && $player->getSplitStatus() === Player::SPLIT_SECOND) {
+                array_splice($this->players, $count, 1);
+                break;
+            }
+            $count++;
+        }
+    }
+
+    /**
      * ブラックジャックをプレイする
      *
      * @return void
@@ -82,20 +148,22 @@ class Game
      */
     private function set(): void
     {
-        echo Message::getSettingMessage();
+        echo 'ブラックジャックの設定をします。' . PHP_EOL;
         $inputNumOfPlayer = 0;
         while ($inputNumOfPlayer !== 1 && $inputNumOfPlayer !== 2 && $inputNumOfPlayer !== 3) {
             // プレイヤー人数について、 1, 2, 3 での入力を求める
-            echo Message::getInputNumOfPlayerMessage();
+            echo 'プレイヤーの人数を入力してください。（1〜3）' . PHP_EOL .
+                '🙋‍ ';
             $inputNumOfPlayer = (int)trim(fgets(STDIN));
             if ($inputNumOfPlayer === 1 || $inputNumOfPlayer === 2 || $inputNumOfPlayer === 3) {
-                $numOfNPC = $inputNumOfPlayer - 1;
-                for ($i = 0; $i < $numOfNPC; $i++) {
-                    $nPCName = 'NPC' . (string)($i + 1);
+                for ($i = 1; $i < $inputNumOfPlayer; $i++) {
+                    $nPCName = 'NPC' . (string)$i;
                     $this->players[] = new AutoPlayer($nPCName);
                 }
+                echo 'プレイヤー' . $inputNumOfPlayer . '名でゲームを開始します。' . PHP_EOL . PHP_EOL;
+                sleep(1);
             } else {
-                echo Message::getSettingInputErrorMessage();
+                echo '1〜3(半角数字)で入力してください。' . PHP_EOL;
             }
         }
     }
@@ -107,12 +175,9 @@ class Game
      */
     private function placeYourBets(): void
     {
-        // TODO: 追記）chips = 0 になった人の処理
-
-        foreach ($this->players as &$player) {
+        foreach ($this->players as $player) {
             $player->bet();
         }
-        unset($player);
     }
 
     /**
@@ -122,18 +187,27 @@ class Game
      */
     private function start(): void
     {
+        echo 'ブラックジャックを開始します。' . PHP_EOL;
+        sleep(1);
         $this->deck->initDeck();
         foreach ($this->players as $player) {
             $this->dealer->dealOutFirstHand($this->deck, $player);
         }
         $this->dealer->dealOutFirstHand($this->deck, $this->dealer->getDealerPlayer());
 
-        $startMessage = Message::getStartMessage();
         foreach ($this->players as $player) {
-            $startMessage .= Message::getFirstHandMessage($player);
+            foreach ($player->getHand() as $card) {
+                echo $player->getName() . 'の引いたカードは' . $card['suit'] . 'の' . $card['num'] . 'です。' . PHP_EOL;
+                sleep(1);
+            }
+            echo PHP_EOL;
         }
-        $startMessage .= Message::getDealerFirstHandMessage($this->dealer->getDealerPlayer());
-        echo $startMessage;
+
+        $dealersFirstCard = $this->dealer->getDealerPlayer()->getHand()[0];
+        echo 'ディーラーの引いたカードは' . $dealersFirstCard['suit'] . 'の' . $dealersFirstCard['num'] . 'です。' . PHP_EOL;
+        sleep(1);
+        echo 'ディーラーの引いた2枚目のカードはわかりません。' . PHP_EOL . PHP_EOL;
+        sleep(1);
     }
 
     /**
@@ -144,9 +218,12 @@ class Game
     private function action(): void
     {
         foreach ($this->players as $player) {
-            $player->action($this->deck, $this->dealer);
+            $player->action($this);
             if ($player->getStatus() === Player::BURST) {
-                echo Message::getLoseByBurstMessage($player);
+                echo Message::getScoreTotalResultMessage($player);
+                echo '合計値が21を超えたので、バーストしました。' . $player->getName() . 'は負けです…' . PHP_EOL
+                    . PHP_EOL;
+                sleep(1);
             }
         }
     }
@@ -158,11 +235,7 @@ class Game
      */
     private function result(): void
     {
-        $this->dealer->getJudge()->judgeWinOrLose(
-            $this->deck,
-            $this->dealer,
-            $this->players
-        );
+        $this->dealer->getJudge()->judgeWinOrLose($this);
     }
 
     /**
@@ -173,7 +246,7 @@ class Game
     private function calcChips(): void
     {
         foreach ($this->players as $player) {
-            $this->dealer->getChipCalculator()->calcChips($player);
+            $this->dealer->getChipCalculator()->calcChips($this, $player);
         }
         $this->dealer->getDealerPlayer()->reset();
     }
@@ -189,10 +262,13 @@ class Game
         foreach ($this->players as $num => $player) {
             if ($player->getChips() === 0 && $player->getName() === 'あなた') {
                 echo 'あなたは、チップの残高がなくなりました。' . PHP_EOL;
+                sleep(1);
                 $this->status = self::STOP;
             } elseif ($player->getChips() === 0) {
                 echo $player->getName() . 'は、チップの残高がなくなりました。' . PHP_EOL;
+                sleep(1);
                 echo $player->getName() . 'は、退出しました。' . PHP_EOL;
+                sleep(1);
                 unset($this->players[$num]);
             }
         }
@@ -206,7 +282,7 @@ class Game
             } elseif ($inputYesOrNo === 'N') {
                 $this->status = self::STOP;
             } else {
-                echo 'Y/N で入力してください。' . PHP_EOL;
+                echo 'Y/N で入力してください。' . PHP_EOL . PHP_EOL;
             }
         }
     }
@@ -218,6 +294,6 @@ class Game
      */
     private function end(): void
     {
-        echo Message::getEndMessage();
+        echo 'ブラックジャックを終了します。' . PHP_EOL . PHP_EOL;
     }
 }

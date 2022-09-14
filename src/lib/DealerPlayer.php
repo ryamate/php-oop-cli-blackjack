@@ -15,26 +15,28 @@ class DealerPlayer extends Player implements PlayerAction
     /**
      * 選択したアクション（ヒットかスタンド）により進行する
      *
-     * @param Deck $deck
-     * @param Dealer $dealer
+     * @param Game $game
      * @return void
      */
-    public function action(Deck $deck, Dealer $dealer): void
+    public function action(Game $game): void
     {
-        $message = '';
         while ($this->getStatus() === self::HIT) {
-            echo Message::getProgressMessage($this);
+            echo Message::getScoreTotalMessage($this);
+            sleep(1);
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
-                $dealer->dealOneCard($deck, $this);
-                $dealer->getJudge()->checkBurst($this);
-                $message = Message::getCardDrawnMessage($this);
+                $game->getDealer()->dealOneCard($game->getDeck(), $this);
+                $game->getDealer()->getJudge()->checkBurst($this);
+
+                echo Message::getCardDrawnMessage($this);
+                sleep(1);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
-                $message = PHP_EOL . PHP_EOL;
+
+                echo 'カードを引きません。' . PHP_EOL . PHP_EOL;
+                sleep(1);
             }
-            echo $message;
         }
     }
 

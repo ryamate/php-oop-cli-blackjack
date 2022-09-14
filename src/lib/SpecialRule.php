@@ -17,18 +17,21 @@ class SpecialRule
      * @param Player $player
      * @return string $message
      */
-    public function applySpecialRule(string $inputYesOrNo, Deck $deck, Dealer $dealer, Player $player): string
+    public function applySpecialRule(string $inputYesOrNo, Game $game, Player $player): string
     {
         $message = '';
         if ($inputYesOrNo === 'DD') {
-            $message = $this->doubleDown($deck, $dealer, $player);
+            $message = $this->doubleDown(
+                $game->getDeck(),
+                $game->getDealer(),
+                $player
+            );
         } elseif ($inputYesOrNo === 'SP') {
-            $message = $this->split($deck, $dealer, $player);
+            $message = $this->split($game, $player);
         } elseif ($inputYesOrNo === 'SR') {
             $message = $this->surrender($player);
         } else {
-            $message .= 'Y/N / DD/SP/SR を入力してください' . PHP_EOL;
-            $message .= Message::getProgressQuestionMessage();
+            $message .= 'Y/N（DD/SP/SR は、最初に手札が配られたときのみ）を入力してください。' . PHP_EOL;
         }
         return $message;
     }
@@ -58,7 +61,7 @@ class SpecialRule
         $dealer->getJudge()->checkBurst($player);
         $message .= Message::getCardDrawnMessage($player);
         if ($player->getStatus() === Player::STAND) {
-            $message .= Message::getProgressMessage($player);
+            $message .= Message::getScoreTotalMessage($player);
         }
         return $message;
     }
@@ -68,43 +71,62 @@ class SpecialRule
      * 最初に配られたカードが同数の場合、カードを2つに分けてそれぞれ別のハンドとしてゲームをプレイする。
      * 最初に掛けた金額と同額の掛け金が必要となる。
      *
-     * @param Deck $deck
-     * @param Dealer $dealer
-     * @param Player $player
+     * @param Game $game
+     * @param ManualPlayer|AutoPlayer $player
      * @return string
      */
-    private function split(Deck $deck, Dealer $dealer, Player $player): string
+    private function split(Game $game, ManualPlayer|AutoPlayer $player): string
     {
         $message = '';
         if ($player->getHand()[0]['score'] !== $player->getHand()[1]['score']) {
             $message .= 'スプリットを宣言するには、最初に配られたカードが同数である必要があります。' . PHP_EOL;
         }
-        if ($player->getChips() >= $player->getBets() * 2) {
+        if ($player->getChips() < ($player->getBets() * 2)) {
             $message .= 'スプリットを宣言するための、チップ残高が足りません。' . PHP_EOL;
         }
-        if ($message !== '') {
-            // TODO: 処理を書く
-            // $player を複製する（$player, $playerSplit）
-            // $playerSplit を $player->split として持たせたい
-            // $player → 手札の1枚目を持つ, $playerSplit → 手札の2枚目を持つ
-            // カードを1枚ずつ引く
-            // 一度だけ、HITかSTANDを選択する
-            // while ($this->getStatus() === self::HIT) {
-            //     $inputYesOrNo = $this->selectHitOrStand();
+        if ($message === '') {
+            // $player を複製する（$player → $playerAsSecondHand
+            $playerAsSecondHand = clone $player;
 
-            //     if ($inputYesOrNo === 'Y') {
-            //         $dealer->dealOneCard($deck, $this);
-            //         $this->changeStatus(self::STAND);
-            //         $dealer->getJudge()->checkBurst($this);
-            //         $message .= Message::getCardDrawnMessage($this);
-            //     } elseif ($inputYesOrNo === 'N') {
-            //         $this->changeStatus(self::STAND);
-            //         $message = PHP_EOL;
-            //     } else {
-            //         $message .= 'Y/Nを入力してください';
-            //     }
-            //     echo $message;
-            // }
+            // $player → 手札の1枚目を持つ, $playerSplit → 手札の2枚目を持つ
+            $player->changeHand(array_slice($player->getHand(), 0, 1));
+            $playerAsSecondHand->changeHand(array_slice($playerAsSecondHand->getHand(), 1));
+
+            $game->addPlayerAsSecondHand($playerAsSecondHand);
+
+            $player->changeSplitStatus(Player::SPLIT_FIRST);
+            $playerAsSecondHand->changeSplitStatus(Player::SPLIT_SECOND);
+
+            foreach ([$player, $playerAsSecondHand] as $playerAfterSplit) {
+                $game->getDealer()->dealOneCard($game->getDeck(), $playerAfterSplit);
+                echo $playerAfterSplit->getSplitStatus() . ' 手目: ' . Message::getCardDrawnMessage($playerAfterSplit);
+                echo $playerAfterSplit->getSplitStatus() . ' 手目: ' . Message::getScoreTotalMessage($playerAfterSplit);
+            }
+
+            foreach ([$player, $playerAsSecondHand] as $playerAfterSplit) {
+                // 一度だけ、HITかSTANDかを選択する
+                while ($playerAfterSplit->getStatus() === Player::HIT) {
+                    echo $playerAfterSplit->getSplitStatus() . ' 手目: ' . 'カードを引きますか？（Y/N）' . PHP_EOL;
+                    $inputYesOrNo = $playerAfterSplit->selectHitOrStand();
+
+                    if ($inputYesOrNo === 'Y') {
+                        $message .= $playerAfterSplit->getSplitStatus() . ' 手目:' . 'ヒットを宣言しました。（カードを引きます）' . PHP_EOL;
+                        $game->getDealer()->dealOneCard($game->getDeck(), $playerAfterSplit);
+                        $message .= $playerAfterSplit->getSplitStatus() . ' 手目:' . Message::getCardDrawnMessage($playerAfterSplit);
+                        $playerAfterSplit->changeStatus(Player::STAND);
+                        $game->getDealer()->getJudge()->checkBurst($playerAfterSplit);
+                        $message .= $playerAfterSplit->getSplitStatus() . ' 手目:' . Message::getScoreTotalMessage($playerAfterSplit);
+                    } elseif ($inputYesOrNo === 'N') {
+                        $message .= $playerAfterSplit->getSplitStatus() . ' 手目:' . 'スタンドを宣言しました。（カードを引きません）' . PHP_EOL;
+                        $playerAfterSplit->changeStatus(Player::STAND);
+                        $message .= $playerAfterSplit->getSplitStatus() . ' 手目:' . Message::getScoreTotalMessage($playerAfterSplit) . PHP_EOL;
+                    } else {
+                        $message .= 'Y/Nを入力してください' . PHP_EOL;
+                    }
+                    echo $message;
+                    $message = '';
+                }
+            }
         }
         return $message;
     }

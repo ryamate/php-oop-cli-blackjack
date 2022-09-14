@@ -10,11 +10,10 @@ interface PlayerAction
     /**
      * プレイヤーのタイプ別にアクションを選択する
      *
-     * @param Deck $deck
-     * @param Dealer $dealer
+     * @param Game $game
      * @return void
      */
-    public function action(Deck $deck, Dealer $dealer): void;
+    public function action(Game $game): void;
 
     /**
      * ヒットかスタンドを Y/N で選択する

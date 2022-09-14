@@ -29,7 +29,8 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
             $error = $this->validateInputBets($input);
             if ($error === '') {
                 $this->changeBets($input);
-                echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL;
+                echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL . PHP_EOL;
+                sleep(1);
             } else {
                 echo $error;
             }
@@ -50,33 +51,37 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
     /**
      * 選択したアクション（ヒットかスタンド）により進行する
      *
-     * @param Deck $deck
-     * @param Dealer $dealer
+     * @param Game $game
      * @return void
      */
-    public function action(Deck $deck, Dealer $dealer): void
+    public function action(Game $game): void
     {
-        $message = '';
-        echo Message::getProgressMessage($this);
-        echo Message::getProgressQuestionMessage();
         while ($this->getStatus() === self::HIT) {
+            echo Message::getScoreTotalMessage($this);
+            sleep(1);
+            echo Message::getProgressQuestionMessage();
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
-                $dealer->dealOneCard($deck, $this);
-                $dealer->getJudge()->checkBurst($this);
-                $message .= Message::getCardDrawnMessage($this);
-                $message .= Message::getProgressMessage($this);
-                $message .= Message::getProgressQuestionMessage();
+                $game->getDealer()->dealOneCard($game->getDeck(), $this);
+                $game->getDealer()->getJudge()->checkBurst($this);
+
+                echo Message::getCardDrawnMessage($this);
+                sleep(1);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
-                $message = PHP_EOL;
-            } elseif (count($this->getHand()) === $dealer::NUM_OF_FIRST_HAND) {
-                $message = $dealer->getSpecialRule()->applySpecialRule($inputYesOrNo, $deck, $dealer, $this);
+
+                echo 'カードを引きません。' . PHP_EOL . PHP_EOL;
+                sleep(1);
+            } elseif (count($this->getHand()) === $game->getDealer()::NUM_OF_FIRST_HAND) {
+                $message = $game->getDealer()->getSpecialRule()->applySpecialRule($inputYesOrNo, $game, $this);
+
+                echo $message;
+                sleep(1);
             } else {
-                $message .= 'Y/N（DD/SP/SR は、最初に手札が配られたときのみ）を入力してください';
+                echo 'Y/N（DD/SP/SR は、最初に手札が配られたときのみ）を入力してください。' . PHP_EOL . PHP_EOL;
+                sleep(1);
             }
-            echo $message;
         }
     }
 

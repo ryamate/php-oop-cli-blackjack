@@ -28,41 +28,42 @@ class Judge
     /**
      * 勝敗を判定する
      *
-     * @param Deck $deck
-     * @param array<int,Player> $players
+     * @param Game $game
      * @return void
      */
-    public function judgeWinOrLose(Deck $deck, Dealer $dealer,  array $players): void
+    public function judgeWinOrLose(Game $game): void
     {
-        echo Message::getStandMessage($dealer->getDealerPlayer());
+        $dealersSecondCard = $game->getDealer()->getDealerPlayer()->getHand()[1];
+        echo 'ディーラーの引いた2枚目のカードは' . $dealersSecondCard['suit'] . 'の' . $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
+        sleep(1);
 
-        if ($this->hasStand($players)) {
-            $dealer->getDealerPlayer()->action($deck, $dealer);
+        if ($this->hasStand($game->getPlayers())) {
+            $game->getDealer()->getDealerPlayer()->action($game);
 
-            $messages = [];
-            $messages[] = Message::getScoreTotalResultMessage($dealer->getDealerPlayer());
+            echo Message::getScoreTotalResultMessage($game->getDealer()->getDealerPlayer());
+            sleep(1);
 
-            if ($dealer->getDealerPlayer()->getStatus() === Player::BURST) {
-                $messages[] = Message::getDealerBurstMessage();
-                foreach ($players as $player) {
+            if ($game->getDealer()->getDealerPlayer()->getStatus() === Player::BURST) {
+                echo Message::getDealerBurstMessage();
+                sleep(1);
+
+                foreach ($game->getPlayers() as $player) {
                     if ($player->getStatus() === Player::STAND) {
                         $player->changeStatus(Player::WIN);
-                        $messages[] = Message::getWinByBurstMessage($player);
+                        echo Message::getWinByBurstMessage($player);
+                        sleep(1);
                     }
                 }
             } else {
-                foreach ($players as $player) {
+                foreach ($game->getPlayers() as $player) {
                     if ($player->getStatus() === Player::STAND) {
-                        $result = $this->compareScoreTotal($dealer->getDealerPlayer(), $player);
+                        $result = $this->compareScoreTotal($game->getDealer()->getDealerPlayer(), $player);
                         $player->changeStatus($result);
-                        $messages[] = Message::getResultMessage($player);
+                        echo Message::getResultMessage($player);
+                        sleep(1);
                     }
                 }
             }
-            foreach ($messages as $message) {
-                echo $message;
-            }
-            unset($message);
         }
     }
 

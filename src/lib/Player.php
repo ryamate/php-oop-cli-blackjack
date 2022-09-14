@@ -10,12 +10,15 @@ abstract class Player
     public const HIT = 'hit';
     public const STAND = 'stand';
     public const BURST = 'burst';
-    public const DOUBLE_DOWN = 'double down';
-    public const SPLIT = 'split';
-    public const SURRENDER = 'surrender';
+
     public const WIN = 'win';
     public const LOSE = 'lose';
     public const DRAW = 'draw';
+
+    public const NO_SPLIT = 0; // 宣言なし
+    public const SPLIT_FIRST = 1; // スプリット宣言 1 手目
+    public const SPLIT_SECOND = 2; // スプリット宣言 2 手目
+
 
     /**
      * コンストラクタ
@@ -27,6 +30,7 @@ abstract class Player
      * @param int $scoreTotal プレイヤーの現在の得点
      * @param int $countAce プレイヤーの引いた A の枚数
      * @param string $status プレイヤーの状態
+     * @param int $splitStatus スプリット宣言の状態
      */
     public function __construct(
         private string $name,
@@ -35,7 +39,8 @@ abstract class Player
         private array $hand = [],
         private int $scoreTotal = 0,
         private int $countAce = 0,
-        private string $status = self::HIT
+        private string $status = self::HIT,
+        private int $splitStatus = self::NO_SPLIT
     ) {
     }
 
@@ -100,6 +105,16 @@ abstract class Player
     }
 
     /**
+     * スプリット宣言の状態を返す
+     *
+     * @return int $this->splitStatus スプリット宣言の状態
+     */
+    public function getSplitStatus(): int
+    {
+        return $this->splitStatus;
+    }
+
+    /**
      * 1枚カードを手札に加える
      *
      * @param array<int,array<string,int|string>> $card
@@ -144,17 +159,6 @@ abstract class Player
     }
 
     /**
-     * プレイヤーの状態を変更する
-     *
-     * @param string $status
-     * @return void
-     */
-    public function changeStatus(string $status): void
-    {
-        $this->status = $status;
-    }
-
-    /**
      * ベット額を変更する
      *
      * @param int $bets
@@ -174,6 +178,39 @@ abstract class Player
     public function changeChips(int $chips): void
     {
         $this->chips = $chips;
+    }
+
+    /**
+     * 手札を変更する
+     *
+     * @param array<int,array<string,int|string>> $hand 手札
+     * @return void
+     */
+    public function changeHand(array $hand): void
+    {
+        $this->hand = $hand;
+    }
+
+    /**
+     * プレイヤーの状態を変更する
+     *
+     * @param string $status
+     * @return void
+     */
+    public function changeStatus(string $status): void
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * スプリット宣言の状態を変更する
+     *
+     * @param int $splitStatus
+     * @return void
+     */
+    public function changeSplitStatus(int $splitStatus): void
+    {
+        $this->splitStatus = $splitStatus;
     }
 
     /**
