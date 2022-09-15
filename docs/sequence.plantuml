@@ -1,5 +1,7 @@
 @startuml Blackjack
 
+title ブラックジャックゲーム全体の流れ
+
 skinparam responseMessageBelowArrow true
 skinparam actorStyle awesome
 
@@ -18,7 +20,7 @@ group #LightGoldenRodYellow Game を new する
   activate Game
   Game ->  Dealer : Dealer を new する
   activate  Dealer
-  Dealer -> Deck : Deck を new する
+  Game -> Deck : Deck を new する
   activate Deck
   Deck -> Card : カード52枚を取得する
   activate Card
@@ -35,7 +37,9 @@ group #LightGoldenRodYellow ゲームの設定をする
   Game -> Message : プレイヤー数を決める(メッセージ表示)
   note over Message
   ブラックジャックの設定をします。
-  プレイヤーの人数を選んでください。（1, 2, 3）
+  プレイヤーの人数を入力してください。（1〜3）
+  🙋‍ 2
+  プレイヤー2名でゲームを開始します。
   end note
 
   Game -> ap : 決めた人数の NPC を new する
@@ -45,186 +49,20 @@ end
 group #LightGoldenRodYellow ベットする額を決める
   Game -> Message : ベットする額を決める(メッセージ表示)
   note over Message
-  『プレイスユアベット』
   あなたの持っているチップは100ドルです。
-  ベットする額を決めてください。（1〜1000ドル）
+  ベットする額を入力してください。（1〜1000ドル）
+  💲 10
+  10ドルをベットしました。
   end note
   Game -> mp : Player の ベットする額 を決めた額に変更する
 end
 
-group #LightGoldenRodYellow ゲームを開始する
-  Game -> Dealer : デッキをシャッフルする
-  Dealer -> Deck : デッキをシャッフルする
-
-  Dealer -> Deck : デッキからプレイヤーに手札2枚を配る
-  Deck --> mp
-
-  Dealer -> Deck : デッキから NPC に手札2枚を配る
-  Deck --> ap
-
-  Dealer -> Deck : デッキから ディーラー に手札2枚を配る
-  Deck --> Dealer
-
-  Game ->  Message : ブラックジャックの開始時の\nメッセージを表示する
-
-  note over Message
-    ブラックジャックを開始します。
-    あなたの引いたカードはハートの7です。
-    あなたの引いたカードはクラブの8です。
-    ディーラーの引いたカードはダイヤのQです。
-    ディーラーの引いた2枚目のカードはわかりません。
-    あなたの現在の得点は15です。カードを引きますか？（Y/N）
-  end note
-
-end
-
-group #LightGoldenRodYellow ゲームを進行する
-
-  group #AliceBlue Player(あなた)は Hit か Stand かを選択する
-    alt Y (Hit)
-      Game -> mp : プレイヤーは1枚カードを引く
-      mp -> Deck : 1枚カードを引く
-      Deck --> mp : 1枚カードを返す
-      mp -> mp : 得点を計算する
-
-      Game -> Dealer : ディーラーはバーストか否かチェックする
-      Dealer -> mp : バーストか否かチェックする
-
-      alt カードの合計値が 21 を超えていない場合
-        Dealer --> Game :
-
-        Game ->  Message : メッセージを表示する
-        note over Message
-          あなたの引いたカードはスペードの５です。
-          あなたの現在の得点は20です。カードを引きますか？（Y/N）
-        end note
-      else Burst (カードの合計値が 21 を超えていた場合)
-        Dealer -> mp : ステータスを\n「burst」に変更する
-        Dealer --> Game :
-
-      end
-    else N (Stand)
-
-      Game ->  Message : メッセージを表示する
-      note over Message
-        あなたの引いた2枚目のカードはダイヤの2でした。
-        あなたの現在の得点は12です。
-      end note
-
-      Game -> mp : ステータスを\n「stand」に変更する
-
-    else 再入力
-      Game ->  Message : メッセージを表示する
-      note over Message
-        Y/N で入力してください。カードを引きますか？（Y/N）
-      end note
-      Game -> Game : 再入力
-    end
-
-    alt Burst (プレイヤーのカードの合計値が 21 を超えていた場合)
-
-      Game ->  Message : メッセージを表示する
-      note over Message #Yellow
-        あなたの引いたカードはダイヤのJです。
-        あなたの現在の得点は25です。
-        合計値が21を超えたので、あなたの負けです。
-      end note
-    end
-  end
-
-  group #LavenderBlush NPC(NPC1, NPC2)がいれば Hit か Stand かを選択する（自動）
-    alt Y (Hit)
-      Game -> ap : NPC は1枚カードを引く
-      ap -> Deck : 1枚カードを引く
-      Deck --> ap : 1枚カードを返す
-      ap -> ap : 得点を計算する
-
-      Game -> Dealer : ディーラーはバーストか否かチェックする
-      Dealer -> ap : バーストか否かチェックする
-
-      alt カードの合計値が 21 を超えていない場合
-        Dealer --> Game :
-        Game ->  Message : メッセージを表示する
-        note over Message
-          NPC の引いたカードはスペードの５です。
-          NPC の現在の得点は20です。カードを引きますか？（Y/N）
-        end note
-      else Burst (カードの合計値が 21 を超えていた場合)
-        Dealer -> ap : ステータスを\n「burst」に変更する
-        Dealer --> Game :
-
-      end
-    else N (Stand)
-
-      Game ->  Message : メッセージを表示する
-      note over Message
-        NPC の引いた2枚目のカードはダイヤの2でした。
-        NPC の現在の得点は12です。
-      end note
-
-      Game -> ap : ステータスを\n「stand」に変更する
-
-    else 再入力
-      Game ->  Message : メッセージを表示する
-      note over Message
-        Y/N で入力してください。カードを引きますか？（Y/N）
-      end note
-      Game -> Game : 再入力
-    end
-
-    alt Burst (プNPC カードの合計値が 21 を超えていた場合)
-      Game ->  Message : メッセージを表示する
-      note over Message #Yellow
-        NPC の引いたカードはダイヤのJです。
-        NPC の現在の得点は25です。
-        合計値が21を超えたので、 NPC の負けです。
-      end note
-    end
-  end
-
-end
-
-group #LightGoldenRodYellow 結果を判定する
-  alt Stand (カードの合計値が 21 以下) のプレイヤーが残っていた場合
-
-      Game -> Dealer : ディーラーは自分のカードの合計値が\n 17 以上になるまで引き続ける
-    loop
-      Dealer -> Deck : 1枚カードを引く
-      Deck --> Dealer : 1枚カードを返す
-      Dealer -> Dealer : 得点を計算する
-      Dealer -> Dealer : ステータスを変更する
-      Dealer ->  Message : メッセージを表示する
-      note over Message
-        ディーラーの引いたカードはハートのKです。
-      end note
-    end
-
-    alt Burst (ディーラーのカードの合計値が 21 を超えていた場合)
-      Dealer ->  Message : メッセージを表示する
-      note over Message #Yellow
-        ディーラーの得点は22です。
-        合計値が21を超えたので、ディーラーはバーストしました。
-        あなたの勝ちです！
-        （NPCの勝ちです！）
-      end note
-
-    else ディーラーのカードの合計値が 21 を超えていない場合
-
-      Dealer -> Dealer : 勝敗を判定する
-      Dealer -> Dealer : スコアを取得する
-      Dealer -> mp : スコアを取得する
-      Dealer -> mp : ステータスを\nwin, lose, draw に変更する
-      Dealer -> ap : ステータスを\nwin, lose, draw に変更する
-
-      Dealer ->  Message : メッセージを表示する
-      note over Message #Yellow
-        あなたの勝ちです！
-        （NPCの勝ちです！）
-        ブラックジャックを終了します。
-      end note
-    end
-  end
-end
+ref over Game
+  別添「１ゲームの流れ」
+  ・ゲームを開始する
+  ・ゲームを進行する
+  ・結果を判定する
+end ref
 
 group #LightGoldenRodYellow チップを計算する
     Game -> Dealer : ディーラーはチップを計算する

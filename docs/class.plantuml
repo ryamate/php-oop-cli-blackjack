@@ -9,6 +9,11 @@ class Game {
   -string status
 
   +__construct()
+  +getDeck()
+  +getDealer()
+  +getPlayers()
+  +addPlayerAsSecondHand()
+  +removeSplitPlayer()
   +play()
   -set()
   -placeYourBets()
@@ -41,11 +46,13 @@ class Dealer {
   -DealerPlayer dealerPlayer
   -Judge judge
   -ChipCalculator chipCalculator
+  -SpecialRule specialRule
 
   +__construct()
   +getDealerPlayer()
   +getJudge()
   +getChipCalculator()
+  +getSpecialRule()
   +dealOutFirstHand()
   +dealOneCard()
 }
@@ -59,6 +66,8 @@ class Judge {
 
 class ChipCalculator {
   +calcChips()
+  +calcChipsDeclaredPlayer()
+  +calcChipsSplitPlayer()
 }
 
 class SpecialRule {
@@ -77,6 +86,7 @@ abstract Player {
   -int scoreTotal
   -int countAce
   -string status
+  -int splitStatus
 
   +__construct()
   +getName()
@@ -85,12 +95,15 @@ abstract Player {
   +getHand()
   +getScoreTotal()
   +getStatus()
+  +getSplitStatus()
   +addACardToHand()
   +calcScoreTotal()
   -calcAceScore()
-  +changeStatus()
   +changeBets()
   +changeChips()
+  +changeHand()
+  +changeStatus()
+  +changeSplitStatus()
   +reset()
 }
 
@@ -128,18 +141,12 @@ class Validator <<trait>> {
 }
 
 class Message {
-  +getSettingMessage()
-  +getInputNumOfPlayerMessage()
-  +getSettingInputErrorMessage()
-
   +getPlaceYourBetsMessage()
-
-  +getStartMessage()
-  +getFirstHandMessage()
   +getDealerFirstHandMessage()
   +getLoseByBurstMessage()
 
   +getProgressMessage()
+  +getScoreTotalMessage()
   +getProgressQuestionMessage()
   +getCardDrawnMessage()
   +getInputErrorMessage()
@@ -149,8 +156,6 @@ class Message {
   +getDealerBurstMessage()
   +getWinByBurstMessage()
   +getResultMessage()
-
-  +getEndMessage()
 }
 
 Game *-- Deck

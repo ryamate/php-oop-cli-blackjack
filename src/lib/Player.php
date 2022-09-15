@@ -140,7 +140,6 @@ abstract class Player
             }
             $this->scoreTotal += $card['score'];
         }
-        unset($card);
         $this->calcAceScore();
     }
 
