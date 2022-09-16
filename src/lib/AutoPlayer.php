@@ -3,38 +3,82 @@
 namespace Blackjack;
 
 require_once('Player.php');
+require_once('PlayerAction.php');
+require_once('PlayerBet.php');
+require_once('Validator.php');
 
 use Blackjack\Player;
+use Blackjack\PlayerAction;
+use Blackjack\PlayerBet;
+use Blackjack\Validator;
 
 /**
  * ノンプレイヤーキャラクタークラス
  */
-class AutoPlayer extends Player
+class AutoPlayer extends Player implements PlayerAction, PlayerBet
 {
+    use Validator;
+
+    /**
+     * プレイヤーのタイプ別にチップをベットする行動を選択する
+     *
+     * @return void
+     */
+    public function bet(): void
+    {
+        while ($this->getBets() === 0) {
+            echo Message::getPlaceYourBetsMessage($this);
+            $input = $this->selectBets();
+            $error = $this->validateInputBets($input);
+            if ($error === '') {
+                $this->changeBets($input);
+                echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL . PHP_EOL;
+                sleep(1);
+            } else {
+                echo $error;
+            }
+        }
+    }
+
+    /**
+     * ベットする額を選択する
+     *
+     * @return string
+     */
+    public function selectBets(): string
+    {
+        $max = $this->getChips() > 1000 ? 1000 : $this->getChips();
+        $input = rand(1, $max);
+        echo $input . PHP_EOL;
+        return $input;
+    }
+
     /**
      * 選択したアクション（ヒットかスタンド）により進行する
      *
-     * @param Deck $deck
-     * @param Dealer $dealer
+     * @param Game $game
      * @return void
      */
-    public function action(Deck $deck, Dealer $dealer): void
+    public function action(Game $game): void
     {
-        $message = '';
-        while ($this->getStatus() === 'hit') {
-            echo Message::getProgressMessage($this);
+        while ($this->getStatus() === self::HIT) {
+            echo Message::getScoreTotalMessage($this);
+            sleep(1);
             echo Message::getProgressQuestionMessage();
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
-                $dealer->dealOneCard($deck, $this);
-                $dealer->checkBurst($this);
-                $message = Message::getCardDrawnMessage($this);
+                $game->getDealer()->dealOneCard($game->getDeck(), $this);
+                $game->getDealer()->getJudge()->checkBurst($this);
+
+                echo Message::getCardDrawnMessage($this);
+                sleep(1);
             } elseif ($inputYesOrNo === 'N') {
-                $this->changeStatus('stand');
-                $message = PHP_EOL;
+                $this->changeStatus(self::STAND);
+
+                echo 'カードを引きません。' . PHP_EOL . PHP_EOL;
+                sleep(1);
             }
-            echo $message;
         }
     }
 

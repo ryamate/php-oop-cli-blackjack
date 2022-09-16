@@ -48,9 +48,7 @@ class Card
                     'score' => $score,
                 ];
             }
-            unset($num);
         }
-        unset($suit);
         return $deck;
     }
 }

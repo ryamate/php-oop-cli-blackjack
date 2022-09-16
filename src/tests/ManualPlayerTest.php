@@ -19,7 +19,7 @@ class PlayerTest extends TestCase
 
     public function testGetHand(): void
     {
-        $player = new ManualPlayer('あなた', [
+        $player = new ManualPlayer('あなた', 0, 0, [
             ['suit' => 'スペード', 'num' => '2', 'score' => 2],
             ['suit' => 'スペード', 'num' => '3', 'score' => 3],
         ]);
@@ -36,7 +36,7 @@ class PlayerTest extends TestCase
     {
         $player = new ManualPlayer('あなた');
         $this->assertSame(0, $player->getScoreTotal());
-        $player2 = new ManualPlayer('きみ', [], 21, 1, 'stand');
+        $player2 = new ManualPlayer('きみ', 0, 0, [], 21, 1, 'stand');
         $this->assertSame(21, $player2->getScoreTotal());
     }
 
@@ -44,13 +44,13 @@ class PlayerTest extends TestCase
     {
         $player = new ManualPlayer('あなた');
         $this->assertSame('hit', $player->getStatus());
-        $player2 = new ManualPlayer('きみ', [], 21, 1, 'stand');
+        $player2 = new ManualPlayer('きみ', 0, 0, [], 21, 1, 'stand');
         $this->assertSame('stand', $player2->getStatus());
     }
 
     public function testAddACardToHand(): void
     {
-        $player = new ManualPlayer('あなた', [
+        $player = new ManualPlayer('あなた', 0, 0, [
             ['suit' => 'スペード', 'num' => '2', 'score' => 2],
             ['suit' => 'スペード', 'num' => '3', 'score' => 3],
         ]);
@@ -69,7 +69,7 @@ class PlayerTest extends TestCase
 
     public function testCalcScoreTotal(): void
     {
-        $player = new ManualPlayer('あなた', [
+        $player = new ManualPlayer('あなた', 0, 0, [
             ['suit' => 'スペード', 'num' => 'A', 'score' => 11],
             ['suit' => 'スペード', 'num' => '3', 'score' => 3],
         ]);

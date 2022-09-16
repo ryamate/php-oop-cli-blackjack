@@ -3,10 +3,10 @@
 namespace Blackjack;
 
 require_once('Player.php');
-require_once('Dealer.php');
+require_once('DealerPlayer.php');
 
 use Blackjack\Player;
-use Blackjack\Dealer;
+use Blackjack\DealerPlayer;
 
 /**
  * メッセージクラス
@@ -14,61 +14,17 @@ use Blackjack\Dealer;
 class Message
 {
     /**
-     * ブラックジャックの開始前の設定メッセージを返す
-     *
-     * @return string
-     */
-    public static function getSettingMessage(): string
-    {
-        return 'ブラックジャックの設定をします。' . PHP_EOL;
-    }
-
-    /**
-     * ブラックジャックの開始前の設定メッセージを返す
-     *
-     * @return string
-     */
-    public static function getInputNumOfPlayerMessage(): string
-    {
-        return 'プレイヤーの人数を選んでください。（1, 2, 3）' . PHP_EOL;
-    }
-
-    /**
      * Y/N 以外の値が入力された時のメッセージを返す
      *
-     * @return string
-     */
-    public static function getSettingInputErrorMessage(): string
-    {
-        return '1, 2, 3 で入力してください。' . PHP_EOL;
-    }
-
-    /**
-     * ブラックジャックの開始時メッセージを返す
-     *
-     * @return string
-     */
-    public static function getStartMessage(): string
-    {
-        return 'ブラックジャックを開始します。' . PHP_EOL;
-    }
-
-    /**
-     * プレイヤーが最初に引いたカードについてのメッセージを返す
-     *
      * @param Player $player
-     * @return string $messages
+     * @return string $message
      */
-    public static function getFirstHandMessage(Player $player): string
+    public static function getPlaceYourBetsMessage(Player $player): string
     {
         $message = '';
-        foreach ($player->getHand() as $card) {
-            $message .= $player->getName() . 'の引いたカードは' .
-                $card['suit'] . 'の' . $card['num'] . 'です。' . PHP_EOL;
-        }
-        unset($card);
-        $message .= PHP_EOL;
-
+        $message .= $player->getName() . 'の持っているチップは' . $player->getChips() . 'ドルです。' . PHP_EOL
+            . 'ベットする額を入力してください。（1〜1000ドル）' . PHP_EOL .
+            '💲 ';
         return $message;
     }
 
@@ -103,12 +59,12 @@ class Message
     }
 
     /**
-     * 引いたカード、現在の得点、カードを引くか、のメッセージを返す
+     * 現在の得点 のメッセージを返す
      *
      * @param Player $player
      * @return string
      */
-    public static function getProgressMessage(Player $player): string
+    public static function getScoreTotalMessage(Player $player): string
     {
         return $player->getName() . 'の現在の得点は' . $player->getScoreTotal() . 'です。' . PHP_EOL;
     }
@@ -120,7 +76,9 @@ class Message
      */
     public static function getProgressQuestionMessage(): string
     {
-        return  'カードを引きますか？（Y/N）' . PHP_EOL;
+        return  'カードを引きますか？（Y/N / DD/SP/SR）' . PHP_EOL .
+            '※ 特殊ルール（DD: ダブルダウン, SP: スプリット, SR: サレンダー）は、最初に手札が配られたときのみ有効' . PHP_EOL .
+            '👉 ';
     }
 
     /**
@@ -168,11 +126,8 @@ class Message
      */
     public static function getStandMessage(DealerPlayer $dealerPlayer): string
     {
-        $dealersHand = $dealerPlayer->getHand();
-        $dealersSecondCard = end($dealersHand);
-        $message = 'ディーラーの引いた2枚目のカードは' .
-            $dealersSecondCard['suit'] . 'の' .
-            $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
+        $dealersSecondCard = $dealerPlayer->getHand()[1];
+        $message = 'ディーラーの引いた2枚目のカードは' . $dealersSecondCard['suit'] . 'の' . $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
         return $message;
     }
 
@@ -195,7 +150,13 @@ class Message
      */
     public static function getWinByBurstMessage(Player $player): string
     {
-        $message = $player->getName() . 'の勝ちです！' . PHP_EOL;
+        if ($player->getSplitStatus() === Player::NO_SPLIT) {
+            $message = $player->getName() . 'の勝ちです！🎉' . PHP_EOL;
+        } elseif ($player->getSplitStatus() === Player::SPLIT_FIRST) {
+            $message = $player->getName() . '(1手目)の勝ちです！🎉' . PHP_EOL;
+        } elseif ($player->getSplitStatus() === Player::SPLIT_SECOND) {
+            $message = $player->getName() . '(2手目)の勝ちです！🎉' . PHP_EOL;
+        }
         return $message;
     }
 
@@ -209,23 +170,13 @@ class Message
     {
         $message = '';
         $playerName = $player->getName();
-        if ($player->getStatus() === 'win') {
-            $message = $playerName . 'の勝ちです！' . PHP_EOL;
-        } elseif ($player->getStatus() === 'lose') {
+        if ($player->getStatus() === Player::WIN) {
+            $message = $playerName . 'の勝ちです！🎉' . PHP_EOL;
+        } elseif ($player->getStatus() === Player::LOSE) {
             $message = $playerName . 'の負けです…' . PHP_EOL;
-        } elseif ($player->getStatus() === 'draw') {
+        } elseif ($player->getStatus() === Player::DRAW) {
             $message = $playerName . 'は引き分けです。' . PHP_EOL;
         }
         return $message;
-    }
-
-    /**
-     * 終了時メッセージを返す
-     *
-     * @return string
-     */
-    public static function getEndMessage(): string
-    {
-        return 'ブラックジャックを終了します。' . PHP_EOL;
     }
 }

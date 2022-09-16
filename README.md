@@ -57,7 +57,7 @@ docker compose down
 以下のフローのように、コンソール（ターミナル）上で動作します。
 
 ```bash
-docker compose exec app php lib/Main.php
+docker compose exec app php Main.php
 ```
 
 - ゲームの設定（プレイヤー人数の設定）をする
@@ -94,7 +94,7 @@ N
 
 ゲームの流れについてのシーケンス図です。
 
-<img src="https://user-images.githubusercontent.com/57904570/183282013-da2bc7d0-d3c8-41d5-a136-2260c844425e.png" width="800">
+<img src="https://user-images.githubusercontent.com/57904570/189475039-bff27919-c42e-423a-9b57-d271ec8b5138.png" width="800">
 
 <br>
 
