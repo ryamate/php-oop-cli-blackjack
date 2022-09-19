@@ -27,17 +27,15 @@ group #LightGoldenRodYellow ゲームを開始する
   Dealer -> Deck : デッキから ディーラー に手札2枚を配る
   Deck --> Dealer
 
-  Game ->  Message : ブラックジャックの開始時の\nメッセージを表示する
+  note right Game #Black
+    <font color="white">ブラックジャックを開始します。</font>
+    <font color="white">あなたの引いたカードはハートの7です。</font>
+    <font color="white">あなたの引いたカードはクラブの8です。</font>
 
-  note over Message
-    ブラックジャックを開始します。
-    あなたの引いたカードはハートの7です。
-    あなたの引いたカードはクラブの8です。
+    <font color="white">ディーラーの引いたカードはダイヤのQです。</font>
+    <font color="white">ディーラーの引いた2枚目のカードはわかりません。</font>
 
-    ディーラーの引いたカードはダイヤのQです。
-    ディーラーの引いた2枚目のカードはわかりません。
-
-    あなたの現在の得点は15です。カードを引きますか？（Y/N）
+    <font color="white">あなたの現在の得点は15です。カードを引きますか？（Y/N）</font>
   end note
 
 end
@@ -63,10 +61,9 @@ group #LightGoldenRodYellow ゲームを進行する
       alt カードの合計値が 21 を超えていない場合
         Dealer --> Game :
 
-        Game ->  Message : メッセージを表示する
-        note over Message
-          あなたの引いたカードはスペードの５です。
-          あなたの現在の得点は20です。カードを引きますか？（Y/N）
+        note right Game #Black
+          <font color="white">あなたの引いたカードはスペードの５です。</font>
+          <font color="white">あなたの現在の得点は20です。カードを引きますか？（Y/N）</font>
         end note
       else Burst (カードの合計値が 21 を超えていた場合)
         Dealer -> mp : ステータスを\n「burst」に変更する
@@ -75,29 +72,26 @@ group #LightGoldenRodYellow ゲームを進行する
       end
     else N (Stand)
 
-      Game ->  Message : メッセージを表示する
-      note over Message
-        あなたの引いた2枚目のカードはダイヤの2でした。
-        あなたの現在の得点は12です。
+      note right Game #Black
+        <font color="white">あなたの引いた2枚目のカードはダイヤの2でした。</font>
+        <font color="white">あなたの現在の得点は12です。</font>
       end note
 
       Game -> mp : ステータスを\n「stand」に変更する
 
     else 再入力
-      Game ->  Message : メッセージを表示する
-      note over Message
-        Y/N で入力してください。カードを引きますか？（Y/N）
+      note right Game #Black
+        <font color="white">Y/N で入力してください。カードを引きますか？（Y/N）</font>
       end note
       Game -> Game : 再入力
     end
 
     alt Burst (プレイヤーのカードの合計値が 21 を超えていた場合)
 
-      Game ->  Message : メッセージを表示する
-      note over Message #Yellow
-        あなたの引いたカードはダイヤのJです。
-        あなたの現在の得点は25です。
-        合計値が21を超えたので、あなたの負けです。
+      note right Game #Black
+        <font color="white">あなたの引いたカードはダイヤのJです。</font>
+        <font color="white">あなたの現在の得点は25です。</font>
+        <font color="white">合計値が21を超えたので、あなたの負けです。</font>
       end note
     end
   end
@@ -114,10 +108,9 @@ group #LightGoldenRodYellow ゲームを進行する
 
       alt カードの合計値が 21 を超えていない場合
         Dealer --> Game :
-        Game ->  Message : メッセージを表示する
-        note over Message
-          NPC の引いたカードはスペードの５です。
-          NPC の現在の得点は20です。カードを引きますか？（Y/N）
+        note right Game #Black
+          <font color="white">NPC の引いたカードはスペードの５です。</font>
+          <font color="white">NPC の現在の得点は20です。カードを引きますか？</font>（Y/N）
         end note
       else Burst (カードの合計値が 21 を超えていた場合)
         Dealer -> ap : ステータスを\n「burst」に変更する
@@ -126,28 +119,25 @@ group #LightGoldenRodYellow ゲームを進行する
       end
     else N (Stand)
 
-      Game ->  Message : メッセージを表示する
-      note over Message
-        NPC の引いた2枚目のカードはダイヤの2でした。
-        NPC の現在の得点は12です。
+      note right Game #Black
+        <font color="white">NPC の引いた2枚目のカードはダイヤの2でした。</font>
+        <font color="white">NPC の現在の得点は12です。</font>
       end note
 
       Game -> ap : ステータスを\n「stand」に変更する
 
     else 再入力
-      Game ->  Message : メッセージを表示する
-      note over Message
-        Y/N で入力してください。カードを引きますか？（Y/N）
+      note right Game #Black
+        <font color="white">Y/N で入力してください。カードを引きますか？（Y/N）</font>
       end note
       Game -> Game : 再入力
     end
 
     alt Burst (NPC カードの合計値が 21 を超えていた場合)
-      Game ->  Message : メッセージを表示する
-      note over Message #Yellow
-        NPC の引いたカードはダイヤのJです。
-        NPC の現在の得点は25です。
-        合計値が21を超えたので、 NPC の負けです。
+      note right Game #Black
+        <font color="white">NPC の引いたカードはダイヤのJです。</font>
+        <font color="white">NPC の現在の得点は25です。</font>
+        <font color="white">合計値が21を超えたので、 NPC の負けです。</font>
       end note
     end
   end
@@ -163,19 +153,17 @@ group #LightGoldenRodYellow 結果を判定する
       Deck --> Dealer : 1枚カードを返す
       Dealer -> Dealer : 得点を計算する
       Dealer -> Dealer : ステータスを変更する
-      Dealer ->  Message : メッセージを表示する
-      note over Message
-        ディーラーの引いたカードはハートのKです。
+      note right Game #Black
+        <font color="white">ディーラーの引いたカードはハートのKです。</font>
       end note
     end
 
     alt Burst (ディーラーのカードの合計値が 21 を超えていた場合)
-      Dealer ->  Message : メッセージを表示する
-      note over Message #Yellow
-        ディーラーの得点は22です。
-        合計値が21を超えたので、ディーラーはバーストしました。
-        あなたの勝ちです！🎉
-        （NPCの勝ちです！🎉）
+      note right Game #Black
+        <font color="white">ディーラーの得点は22です。</font>
+        <font color="white">合計値が21を超えたので、ディーラーはバーストしました。</font>
+        <font color="white">あなたの勝ちです！🎉</font>
+        <font color="white">（NPCの勝ちです！🎉）</font>
       end note
 
     else ディーラーのカードの合計値が 21 を超えていない場合
@@ -186,10 +174,9 @@ group #LightGoldenRodYellow 結果を判定する
       Dealer -> mp : ステータスを\nwin, lose, draw に変更する
       Dealer -> ap : ステータスを\nwin, lose, draw に変更する
 
-      Dealer ->  Message : メッセージを表示する
-      note over Message #Yellow
-        あなたの勝ちです！🎉
-        （NPCの勝ちです！🎉）
+      note right Game #Black
+        <font color="white">あなたの勝ちです！🎉</font>
+        <font color="white">（NPCの勝ちです！🎉）</font>
       end note
     end
   end

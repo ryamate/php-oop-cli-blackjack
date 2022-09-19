@@ -127,7 +127,8 @@ class Message
     public static function getStandMessage(DealerPlayer $dealerPlayer): string
     {
         $dealersSecondCard = $dealerPlayer->getHand()[1];
-        $message = 'ディーラーの引いた2枚目のカードは' . $dealersSecondCard['suit'] . 'の' . $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
+        $message = 'ディーラーの引いた2枚目のカードは' .
+            $dealersSecondCard['suit'] . 'の' . $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
         return $message;
     }
 
@@ -150,12 +151,15 @@ class Message
      */
     public static function getWinByBurstMessage(Player $player): string
     {
-        if ($player->getSplitStatus() === Player::NO_SPLIT) {
-            $message = $player->getName() . 'の勝ちです！🎉' . PHP_EOL;
-        } elseif ($player->getSplitStatus() === Player::SPLIT_FIRST) {
-            $message = $player->getName() . '(1手目)の勝ちです！🎉' . PHP_EOL;
-        } elseif ($player->getSplitStatus() === Player::SPLIT_SECOND) {
-            $message = $player->getName() . '(2手目)の勝ちです！🎉' . PHP_EOL;
+        $message = '';
+        $splitStatus = $player->getSplitStatus();
+        $playerName = $player->getName();
+        if ($splitStatus === $player::NO_SPLIT) {
+            $message = $playerName . 'の勝ちです！🎉' . PHP_EOL;
+        } elseif ($splitStatus === $player::SPLIT_FIRST) {
+            $message = $playerName . '(1手目)の勝ちです！🎉' . PHP_EOL;
+        } elseif ($splitStatus === $player::SPLIT_SECOND) {
+            $message = $playerName . '(2手目)の勝ちです！🎉' . PHP_EOL;
         }
         return $message;
     }
@@ -169,12 +173,20 @@ class Message
     public static function getResultMessage(Player $player): string
     {
         $message = '';
+        $status = $player->getStatus();
+        $splitStatus = $player->getSplitStatus();
         $playerName = $player->getName();
-        if ($player->getStatus() === Player::WIN) {
+        if ($splitStatus === $player::SPLIT_FIRST) {
+            $playerName = $playerName . '(1手目)';
+        } elseif ($splitStatus === $player::SPLIT_SECOND) {
+            $playerName = $playerName . '(2手目)';
+        }
+
+        if ($status === $player::WIN) {
             $message = $playerName . 'の勝ちです！🎉' . PHP_EOL;
-        } elseif ($player->getStatus() === Player::LOSE) {
+        } elseif ($status === $player::LOSE) {
             $message = $playerName . 'の負けです…' . PHP_EOL;
-        } elseif ($player->getStatus() === Player::DRAW) {
+        } elseif ($status === $player::DRAW) {
             $message = $playerName . 'は引き分けです。' . PHP_EOL;
         }
         return $message;

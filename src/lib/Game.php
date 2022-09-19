@@ -12,6 +12,7 @@ require_once('Judge.php');
 require_once('ChipCalculator.php');
 require_once('SpecialRule.php');
 require_once('Message.php');
+require_once('Validator.php');
 
 use Blackjack\Deck;
 use Blackjack\Player;
@@ -23,14 +24,23 @@ use Blackjack\Judge;
 use Blackjack\ChipCalculator;
 use Blackjack\SpecialRule;
 use Blackjack\Message;
+use Blackjack\Validator;
 
 /**
  * ゲームクラス
  */
 class Game
 {
+    use Validator;
+
     public const CONTINUE = 'continue';
     public const STOP = 'stop';
+    public const GAME_STATUS = [
+        self::CONTINUE => 1,
+        self::STOP => 0,
+    ];
+    public const MAX_NUM_OF_PLAYERS = 3;
+    public const MAX_BET = 1000;
 
     /**
      * コンストラクタ
@@ -38,13 +48,13 @@ class Game
      * @param Deck $deck デッキ
      * @param Dealer $dealer ディーラー
      * @param array<int,ManualPlayer|AutoPlayer> $players プレイヤー
-     * @param string $status ゲームを続けるか、やめるかの状態
+     * @param int $status ゲームを続けるか、やめるかの状態
      */
     public function __construct(
         private ?Deck $deck = null,
         private ?Dealer $dealer = null,
         private array $players = [],
-        private string $status = self::CONTINUE,
+        private int $status = self::GAME_STATUS[self::CONTINUE],
     ) {
         $this->deck = $deck ?? new Deck();
         $this->dealer = $dealer ?? new Dealer(
@@ -87,42 +97,6 @@ class Game
     }
 
     /**
-     * プレイヤーの配列 にスプリットを宣言したプレイヤーの 2 手目を追加する
-     * - 特殊ルール split で利用
-     *
-     * @param  ManualPlayer|AutoPlayer $playerAsSecondHand スプリットを宣言したプレイヤーの 2 手目
-     */
-    public function addPlayerAsSecondHand(ManualPlayer|AutoPlayer $playerAsSecondHand): void
-    {
-        $count = 0;
-        foreach ($this->players as $player) {
-            ++$count;
-            if ($player->getName() === $playerAsSecondHand->getName()) {
-                array_splice($this->players, $count, 0, [$playerAsSecondHand]);
-                break;
-            }
-        }
-    }
-
-    /**
-     * プレイヤーの配列 にプレイヤーを追加する
-     * 特殊ルール Split で利用するため
-     *
-     * @param  ManualPlayer|AutoPlayer $players プレイヤー
-     */
-    public function removeSplitPlayer(ManualPlayer|AutoPlayer $splitPlayer): void
-    {
-        $count = 0;
-        foreach ($this->players as $player) {
-            if ($player->getName() === $splitPlayer->getName() && $player->getSplitStatus() === Player::SPLIT_SECOND) {
-                array_splice($this->players, $count, 1);
-                break;
-            }
-            $count++;
-        }
-    }
-
-    /**
      * ブラックジャックをプレイする
      *
      * @return void
@@ -130,12 +104,12 @@ class Game
     public function play(): void
     {
         $this->set();
-        while ($this->status === self::CONTINUE) {
+        while ($this->status === self::GAME_STATUS[self::CONTINUE]) {
             $this->placeYourBets();
-            $this->start();
+            $this->startGame();
             $this->action();
-            $this->result();
-            $this->calcChips();
+            $this->resultGame();
+            $this->resultCalcChips();
             $this->selectContinueOrStop();
         }
         $this->end();
@@ -149,13 +123,14 @@ class Game
     private function set(): void
     {
         echo 'ブラックジャックの設定をします。' . PHP_EOL;
-        $inputNumOfPlayer = 0;
-        while ($inputNumOfPlayer !== 1 && $inputNumOfPlayer !== 2 && $inputNumOfPlayer !== 3) {
+        $inputNumOfPlayer = '';
+        while ($inputNumOfPlayer === '') {
             // プレイヤー人数について、 1, 2, 3 での入力を求める
             echo 'プレイヤーの人数を入力してください。（1〜3）' . PHP_EOL .
                 '🙋‍ ';
-            $inputNumOfPlayer = (int)trim(fgets(STDIN));
-            if ($inputNumOfPlayer === 1 || $inputNumOfPlayer === 2 || $inputNumOfPlayer === 3) {
+            $inputNumOfPlayer = trim(fgets(STDIN));
+            $error = $this->validateInputNumOfPlayer($inputNumOfPlayer, self::MAX_NUM_OF_PLAYERS);
+            if ($error === '') {
                 for ($i = 1; $i < $inputNumOfPlayer; $i++) {
                     $nPCName = 'NPC' . (string)$i;
                     $this->players[] = new AutoPlayer($nPCName);
@@ -163,7 +138,8 @@ class Game
                 echo 'プレイヤー' . $inputNumOfPlayer . '名でゲームを開始します。' . PHP_EOL . PHP_EOL;
                 sleep(1);
             } else {
-                echo '1〜3(半角数字)で入力してください。' . PHP_EOL;
+                echo $error . PHP_EOL;
+                $inputNumOfPlayer = '';
             }
         }
     }
@@ -185,7 +161,7 @@ class Game
      *
      * @return void
      */
-    private function start(): void
+    private function startGame(): void
     {
         echo 'ブラックジャックを開始します。' . PHP_EOL;
         sleep(1);
@@ -233,22 +209,37 @@ class Game
      *
      * @return void
      */
-    private function result(): void
+    private function resultGame(): void
     {
         $this->dealer->getJudge()->judgeWinOrLose($this);
     }
 
     /**
-     * 勝敗、特殊ルールに応じたプレイヤーのチップ残高を算出し、プレイヤーとディーラーのゲーム中のステータスをリセットする
+     * 勝敗、特殊ルールに応じたプレイヤーのチップ残高を算出し、結果を表示する。
+     * - プレイヤーとディーラーのゲーム中のステータスをリセットする。
      *
      * @return void
      */
-    private function calcChips(): void
+    private function resultCalcChips(): void
     {
         foreach ($this->players as $player) {
             $this->dealer->getChipCalculator()->calcChips($this, $player);
         }
         $this->dealer->getDealerPlayer()->reset();
+
+        foreach ($this->players as $num => $player) {
+            if ($player->getChips() === 0 && $player->getName() === 'あなた') {
+                echo 'あなたは、チップの残高がなくなりました。' . PHP_EOL;
+                sleep(1);
+                $this->status = self::GAME_STATUS[self::STOP];
+            } elseif ($player->getChips() === 0) {
+                echo $player->getName() . 'は、チップの残高がなくなりました。' . PHP_EOL;
+                sleep(1);
+                echo $player->getName() . 'は、退出しました。' . PHP_EOL;
+                sleep(1);
+                unset($this->players[$num]);
+            }
+        }
     }
 
     /**
@@ -259,30 +250,20 @@ class Game
     private function selectContinueOrStop(): void
     {
         $inputYesOrNo = '';
-        foreach ($this->players as $num => $player) {
-            if ($player->getChips() === 0 && $player->getName() === 'あなた') {
-                echo 'あなたは、チップの残高がなくなりました。' . PHP_EOL;
-                sleep(1);
-                $this->status = self::STOP;
-            } elseif ($player->getChips() === 0) {
-                echo $player->getName() . 'は、チップの残高がなくなりました。' . PHP_EOL;
-                sleep(1);
-                echo $player->getName() . 'は、退出しました。' . PHP_EOL;
-                sleep(1);
-                unset($this->players[$num]);
-            }
-        }
-        while ($this->status === self::CONTINUE && $inputYesOrNo !== 'Y' && $inputYesOrNo !== 'N') {
+        while ($this->status === self::GAME_STATUS[self::CONTINUE] && $inputYesOrNo === '') {
             echo 'ブラックジャックゲームを続けますか？（Y/N）' . PHP_EOL .
                 '👉 ';
             $inputYesOrNo = trim(fgets(STDIN));
-
-            if ($inputYesOrNo === 'Y') {
-                $this->status = self::CONTINUE;
-            } elseif ($inputYesOrNo === 'N') {
-                $this->status = self::STOP;
+            $error = $this->validateInputYesOrNo($inputYesOrNo);
+            if ($error === '') {
+                if ($inputYesOrNo === 'Y') {
+                    $this->status = self::GAME_STATUS[self::CONTINUE];
+                } elseif ($inputYesOrNo === 'N') {
+                    $this->status = self::GAME_STATUS[self::STOP];
+                }
             } else {
-                echo 'Y/N で入力してください。' . PHP_EOL . PHP_EOL;
+                echo $error . PHP_EOL;
+                $inputYesOrNo = '';
             }
         }
     }
@@ -295,5 +276,43 @@ class Game
     private function end(): void
     {
         echo 'ブラックジャックを終了します。' . PHP_EOL . PHP_EOL;
+    }
+
+    /**
+     * プレイヤーの配列 にスプリットを宣言したプレイヤーの 2 手目を追加する
+     * - 特殊ルール split で利用
+     *
+     * @param  ManualPlayer|AutoPlayer $playerAsSecondHand スプリットを宣言したプレイヤーの 2 手目
+     */
+    public function addPlayerAsSecondHand(ManualPlayer|AutoPlayer $playerAsSecondHand): void
+    {
+        $count = 0;
+        foreach ($this->players as $player) {
+            ++$count;
+            if ($player->getName() === $playerAsSecondHand->getName()) {
+                array_splice($this->players, $count, 0, [$playerAsSecondHand]);
+                break;
+            }
+        }
+    }
+
+    /**
+     * スプリットを宣言したプレイヤーの 2 手目をプレイヤーの配列から削除する
+     * - 特殊ルール split で利用
+     *
+     * @param Player $splitPlayer プレイヤー
+     */
+    public function removeSplitPlayer(Player $splitPlayer): void
+    {
+        $countPlayers = count($this->players);
+        for ($i = 0; $i < $countPlayers; $i++) {
+            if (
+                $this->players[$i]->getName() === $splitPlayer->getName() &&
+                $this->players[$i]->getSplitStatus() === Player::SPLIT_SECOND
+            ) {
+                array_splice($this->players, $i, 1);
+                break;
+            }
+        }
     }
 }

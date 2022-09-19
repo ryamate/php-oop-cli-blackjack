@@ -24,8 +24,8 @@ class Card
         'A' => 11, // Aは1点あるいは11点として、手の点数が最大となる方で数える（初期値 11 にする）
     ];
 
-    /** @var array<int,string> $suits 各カードのマーク */
-    private array $suits = [
+    /** array<int,string> 各カードのマーク */
+    private const SUITS = [
         'スペード',
         'ハート',
         'ダイヤ',
@@ -40,7 +40,7 @@ class Card
     public function createNewDeck(): array
     {
         $deck = [];
-        foreach ($this->suits as $suit) {
+        foreach (self::SUITS as $suit) {
             foreach (self::CARD_SCORE as $num => $score) {
                 $deck[] = [
                     'suit' => $suit,

@@ -2,6 +2,8 @@
 
 ディーラーとプレイヤーで対戦するコンソールゲームです。
 
+<img src="https://user-images.githubusercontent.com/57904570/190954501-283071d5-6474-4bbd-8830-b8e9c13fd0d1.gif" width="800">
+
 ## 作成する目的
 
 下記目的のため、ブラックジャックを PHP、オブジェクト指向を使って実装します。
@@ -94,14 +96,25 @@ N
 
 ゲームの流れについてのシーケンス図です。
 
-<img src="https://user-images.githubusercontent.com/57904570/189475039-bff27919-c42e-423a-9b57-d271ec8b5138.png" width="800">
+<img src="https://user-images.githubusercontent.com/57904570/190953728-8f2595f8-698c-4ef5-96fa-42be1a4579f9.png" width="800">
+
+<img src="https://user-images.githubusercontent.com/57904570/190953739-12f89cdd-eeb2-4344-a9ef-1bef55006e2c.png" width="800">
 
 <br>
 
+### クラス図
+
+クラス図です。
+
+<img src="https://user-images.githubusercontent.com/57904570/190953613-b8178fd9-af82-466f-bc8e-507222ed6065.png" width="800">
+
 ## 備考
 
-下記、教材の課題です（本課題に解答はないため、自分で実装したプログラムです）
+- 下記、教材の課題です（本課題に解答はないため、自分で実装したプログラムです）
 
-- [独学エンジニア](https://dokugaku-engineer.com/)
-  - PART3 PHP とオブジェクト指向
-    - レッスン 17 ブラックジャックゲームを作ろう
+  - [独学エンジニア](https://dokugaku-engineer.com/)
+    - PART3 PHP とオブジェクト指向
+      - レッスン 17 ブラックジャックゲームを作ろう
+
+- Qiita 記事にまとめました
+  - https://qiita.com/ryamate/items/f77efb0888bb025e5f5b
