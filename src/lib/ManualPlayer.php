@@ -60,21 +60,21 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
             echo Message::getScoreTotalMessage($this);
             sleep(1);
             echo Message::getProgressQuestionMessage();
-            $inputAction = $this->selectHitOrStand();
+            $inputYesOrNo = $this->selectHitOrStand();
 
-            if ($inputAction === 'Y') {
+            if ($inputYesOrNo === 'Y') {
                 $game->getDealer()->dealOneCard($game->getDeck(), $this);
                 $game->getDealer()->getJudge()->checkBurst($this);
 
                 echo Message::getCardDrawnMessage($this);
                 sleep(1);
-            } elseif ($inputAction === 'N') {
+            } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
 
                 echo 'カードを引きません。' . PHP_EOL . PHP_EOL;
                 sleep(1);
             } elseif (count($this->getHand()) === $game->getDealer()::NUM_OF_FIRST_HAND) {
-                $message = $game->getDealer()->getSpecialRule()->applySpecialRule($inputAction, $game, $this);
+                $message = $game->getDealer()->getSpecialRule()->applySpecialRule($inputYesOrNo, $game, $this);
 
                 echo $message;
                 sleep(1);
@@ -92,7 +92,7 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
      */
     public function selectHitOrStand(): string
     {
-        $inputAction = trim(fgets(STDIN));
-        return $inputAction;
+        $inputYesOrNo = trim(fgets(STDIN));
+        return $inputYesOrNo;
     }
 }

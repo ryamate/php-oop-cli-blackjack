@@ -3,10 +3,8 @@
 namespace Blackjack;
 
 require_once('Player.php');
-require_once('Message.php');
 
 use Blackjack\Player;
-use Blackjack\Message;
 
 class SpecialRule
 {
@@ -15,23 +13,23 @@ class SpecialRule
     /**
      * 特殊ルールを適用する
      *
-     * @param string $inputAction
+     * @param string $inputYesOrNo
      * @param Game $game
      * @param ManualPlayer|AutoPlayer $player
      * @return string $message
      */
-    public function applySpecialRule(string $inputAction, Game $game, ManualPlayer|AutoPlayer $player): string
+    public function applySpecialRule(string $inputYesOrNo, Game $game, ManualPlayer|AutoPlayer $player): string
     {
         $message = '';
-        if ($inputAction === 'DD') {
+        if ($inputYesOrNo === 'DD') {
             $message = $this->doubleDown(
                 $game->getDeck(),
                 $game->getDealer(),
                 $player
             );
-        } elseif ($inputAction === 'SP') {
+        } elseif ($inputYesOrNo === 'SP') {
             $message = $this->split($game, $player);
-        } elseif ($inputAction === 'SR') {
+        } elseif ($inputYesOrNo === 'SR') {
             $message = $this->surrender($player);
         } else {
             $message .= 'Y/N（DD/SP/SR は、最初に手札が配られたときのみ）を入力してください。' . PHP_EOL;
