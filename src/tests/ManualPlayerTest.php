@@ -9,7 +9,7 @@ require_once(__DIR__ . '/../lib/Card.php');
 use PHPUnit\Framework\TestCase;
 use Blackjack\ManualPlayer;
 
-class PlayerTest extends TestCase
+class ManualPlayerTest extends TestCase
 {
     public function testGetName(): void
     {
