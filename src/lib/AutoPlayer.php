@@ -2,11 +2,13 @@
 
 namespace Blackjack;
 
+require_once('Game.php');
 require_once('Player.php');
 require_once('PlayerAction.php');
 require_once('PlayerBet.php');
 require_once('Validator.php');
 
+use Blackjack\Game;
 use Blackjack\Player;
 use Blackjack\PlayerAction;
 use Blackjack\PlayerBet;
@@ -26,18 +28,11 @@ class AutoPlayer extends Player implements PlayerAction, PlayerBet
      */
     public function bet(): void
     {
-        while ($this->getBets() === 0) {
-            echo Message::getPlaceYourBetsMessage($this);
-            $input = $this->selectBets();
-            $error = $this->validateInputBets($input);
-            if ($error === '') {
-                $this->changeBets($input);
-                echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL . PHP_EOL;
-                sleep(1);
-            } else {
-                echo $error;
-            }
-        }
+        echo Message::getPlaceYourBetsMessage($this);
+        $input = $this->selectBets();
+        $this->changeBets((int)$input);
+        echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL . PHP_EOL;
+        sleep(1);
     }
 
     /**
@@ -47,10 +42,10 @@ class AutoPlayer extends Player implements PlayerAction, PlayerBet
      */
     public function selectBets(): string
     {
-        $max = $this->getChips() > 1000 ? 1000 : $this->getChips();
-        $input = rand(1, $max);
+        $maxBet = $this->getChips() > Game::MAX_BET ? Game::MAX_BET : $this->getChips();
+        $input = rand(1, $maxBet);
         echo $input . PHP_EOL;
-        return $input;
+        return (string)$input;
     }
 
     /**

@@ -19,7 +19,7 @@ class Judge
     public function checkBurst(Player $player): bool
     {
         if ($player->getScoreTotal() > 21) {
-            $player->changeStatus(Player::BURST);
+            $player->changeStatus($player::BURST);
             return true;
         }
         return false;
@@ -48,15 +48,15 @@ class Judge
                 sleep(1);
 
                 foreach ($game->getPlayers() as $player) {
-                    if ($player->getStatus() === Player::STAND) {
-                        $player->changeStatus(Player::WIN);
+                    if ($player->getStatus() === $player::STAND) {
+                        $player->changeStatus($player::WIN);
                         echo Message::getWinByBurstMessage($player);
                         sleep(1);
                     }
                 }
             } else {
                 foreach ($game->getPlayers() as $player) {
-                    if ($player->getStatus() === Player::STAND) {
+                    if ($player->getStatus() === $player::STAND) {
                         $result = $this->compareScoreTotal($game->getDealer()->getDealerPlayer(), $player);
                         $player->changeStatus($result);
                         echo Message::getResultMessage($player);
@@ -76,7 +76,7 @@ class Judge
     private function hasStand(array $players): bool
     {
         foreach ($players as $player) {
-            if ($player->getStatus() === Player::STAND) {
+            if ($player->getStatus() === $player::STAND) {
                 return true;
             }
         }
@@ -95,11 +95,11 @@ class Judge
         $playerScoreTotal = $player->getScoreTotal();
         $dealerScoreTotal = $dealerPlayer->getScoreTotal();
         if ($playerScoreTotal > $dealerScoreTotal) {
-            $result = Player::WIN;
+            $result = $player::WIN;
         } elseif ($playerScoreTotal < $dealerScoreTotal) {
-            $result = Player::LOSE;
+            $result = $player::LOSE;
         } elseif ($playerScoreTotal === $dealerScoreTotal) {
-            $result = Player::DRAW;
+            $result = $player::DRAW;
         }
         return $result;
     }

@@ -1,28 +1,32 @@
 @startuml Blackjack
 
 class Game {
-  -CONTINUE
-  -STOP
+  -string CONTINUE
+  -string STOP
+  -array GAME_STATUS
+
+  -int MAX_NUM_OF_PLAYERS
+  -int MAX_BET
   -Deck deck
   -Dealer dealer
   -array<int,Player> players
-  -string status
+  -int status
 
   +__construct()
   +getDeck()
   +getDealer()
   +getPlayers()
-  +addPlayerAsSecondHand()
-  +removeSplitPlayer()
   +play()
   -set()
   -placeYourBets()
-  -start()
+  -startGame()
   -action()
-  -result()
-  -calcChips()
+  -resultGame()
+  -resultCalcChips()
   -selectContinueOrStop()
   -end()
+  +addPlayerAsSecondHand()
+  +removeSplitPlayer()
 }
 
 class Deck {
@@ -35,14 +39,14 @@ class Deck {
 }
 
 class Card {
-  -CARD_SCORE
+  -array CARD_SCORE
+  -array SUITS
 
-  -array suits
   +createNewDeck()
 }
 
 class Dealer {
-  +NUM_OF_FIRST_HAND
+  +int NUM_OF_FIRST_HAND
   -DealerPlayer dealerPlayer
   -Judge judge
   -ChipCalculator chipCalculator
@@ -66,8 +70,8 @@ class Judge {
 
 class ChipCalculator {
   +calcChips()
-  +calcChipsDeclaredPlayer()
-  +calcChipsSplitPlayer()
+  +calcChipsSplitFirstHand()
+  +calcChipsSplitSecondHand()
 }
 
 class SpecialRule {
@@ -79,6 +83,16 @@ class SpecialRule {
 }
 
 abstract Player {
+  +HIT
+  +STAND
+  +BURST
+  +WIN
+  +LOSE
+  +DRAW
+  +NO_SPLIT
+  +SPLIT_FIRST
+  +SPLIT_SECOND
+
   -string name
   -int chips
   -int bets
@@ -137,7 +151,10 @@ class AutoPlayer {
 }
 
 class Validator <<trait>> {
+  +validateInputYesOrNo()
+  +validateInputNumOfPlayer()
   +validateInputBets()
+  +validateSplitConditions()
 }
 
 class Message {
@@ -145,7 +162,6 @@ class Message {
   +getDealerFirstHandMessage()
   +getLoseByBurstMessage()
 
-  +getProgressMessage()
   +getScoreTotalMessage()
   +getProgressQuestionMessage()
   +getCardDrawnMessage()
@@ -163,11 +179,12 @@ Deck *-- Card
 Game *-- Dealer
 Deck - Dealer
 Dealer - Player
-Dealer *-- Judge
-Dealer *-- ChipCalculator
+Dealer *--- Judge
+Dealer *---- ChipCalculator
 Dealer -- SpecialRule
 Game -- SpecialRule
 SpecialRule -- ManualPlayer
+SpecialRule -- Validator
 Dealer *-- DealerPlayer
 Game -- Player
 Game --- ManualPlayer
@@ -182,6 +199,7 @@ PlayerBet <|.. ManualPlayer
 PlayerBet <|.. AutoPlayer
 ManualPlayer -- Validator
 AutoPlayer -- Validator
+Game ----- Validator
 Game -- Message
 
 @enduml

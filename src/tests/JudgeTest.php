@@ -16,6 +16,7 @@ use Blackjack\DealerPlayer;
 use Blackjack\Judge;
 use Blackjack\ChipCalculator;
 use Blackjack\Deck;
+use Blackjack\Game;
 use Blackjack\ManualPlayer;
 use Blackjack\SpecialRule;
 
@@ -35,53 +36,59 @@ class JudgeTest extends TestCase
 
     public function testJudgeWinOrLose(): void
     {
-        $deck = new Deck();
-        $deck->initDeck();
-
         // ディーラーがバーストしない場合、点数を比較して勝敗を判定されることをテストする
-        $dealer1 = new Dealer(
-            new DealerPlayer('ディーラー1', 0, 0, [
-                ['suit' => 'スペード', 'num' => '10', 'score' => 10],
-                ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
-            ], 20, 0, 'hit'),
-            new Judge(),
-            new ChipCalculator(),
-            new SpecialRule()
+        $game1 = new Game(
+            new Deck(),
+            new Dealer(
+                new DealerPlayer('ディーラー1', 0, 0, [
+                    ['suit' => 'スペード', 'num' => '10', 'score' => 10],
+                    ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
+                ], 20, 0, 'hit'),
+                new Judge(),
+                new ChipCalculator(),
+                new SpecialRule()
+            ),
+            [
+                new ManualPlayer('プレイヤー1', 0, 0, [], 21, 0, 'stand'),
+                new ManualPlayer('プレイヤー2', 0, 0, [], 20, 0, 'stand'),
+                new ManualPlayer('プレイヤー3', 0, 0, [], 19, 0, 'stand')
+            ],
         );
+        $game1->getDeck()->initDeck();
 
-        $players = [];
-        $players[] = new ManualPlayer('プレイヤー1', 0, 0, [], 21, 0, 'stand');
-        $players[] = new ManualPlayer('プレイヤー2', 0, 0, [], 20, 0, 'stand');
-        $players[] = new ManualPlayer('プレイヤー3', 0, 0, [], 19, 0, 'stand');
-
-        $dealer1->getJudge()->judgeWinOrLose($deck, $dealer1, $players);
-        $this->assertSame('win', $players[0]->getStatus());
-        $this->assertSame('draw', $players[1]->getStatus());
-        $this->assertSame('lose', $players[2]->getStatus());
+        $game1->getDealer()->getJudge()->judgeWinOrLose($game1);
+        $this->assertSame('win', $game1->getPlayers()[0]->getStatus());
+        $this->assertSame('draw', $game1->getPlayers()[1]->getStatus());
+        $this->assertSame('lose', $game1->getPlayers()[2]->getStatus());
 
         // ディーラーがバーストした場合、スタンドのプレイヤーは勝ち、バーストのプレイヤーはバースト
         // と判定されることをテストする
-        $dealer2 = new Dealer(
-            new DealerPlayer('ディーラー2', 0, 0, [
-                ['suit' => 'スペード', 'num' => '10', 'score' => 10],
-                ['suit' => 'スペード', 'num' => '5', 'score' => 5],
-                ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
-            ], 25, 0, 'burst'),
-            new Judge(),
-            new ChipCalculator(),
-            new SpecialRule()
+        // ディーラーがバーストしない場合、点数を比較して勝敗を判定されることをテストする
+        $game2 = new Game(
+            new Deck(),
+            new Dealer(
+                new DealerPlayer('ディーラー2', 0, 0, [
+                    ['suit' => 'スペード', 'num' => '10', 'score' => 10],
+                    ['suit' => 'スペード', 'num' => '5', 'score' => 5],
+                    ['suit' => 'スペード', 'num' => 'J', 'score' => 10],
+                ], 25, 0, 'burst'),
+                new Judge(),
+                new ChipCalculator(),
+                new SpecialRule()
+            ),
+            [
+                new ManualPlayer('プレイヤー1', 0, 0, [], 21, 0, 'stand'),
+                new ManualPlayer('プレイヤー2', 0, 0, [], 20, 0, 'stand'),
+                new ManualPlayer('プレイヤー3', 0, 0, [], 19, 0, 'stand'),
+                new ManualPlayer('プレイヤー4', 0, 0, [], 25, 0, 'burst')
+            ],
         );
+        $game2->getDeck()->initDeck();
 
-        $players = [];
-        $players[] = new ManualPlayer('プレイヤー1', 0, 0, [], 21, 0, 'stand');
-        $players[] = new ManualPlayer('プレイヤー2', 0, 0, [], 20, 0, 'stand');
-        $players[] = new ManualPlayer('プレイヤー3', 0, 0, [], 19, 0, 'stand');
-        $players[] = new ManualPlayer('プレイヤー4', 0, 0, [], 25, 0, 'burst');
-
-        $dealer2->getJudge()->judgeWinOrLose($deck, $dealer2, $players);
-        $this->assertSame('win', $players[0]->getStatus());
-        $this->assertSame('win', $players[1]->getStatus());
-        $this->assertSame('win', $players[2]->getStatus());
-        $this->assertSame('burst', $players[3]->getStatus());
+        $game2->getDealer()->getJudge()->judgeWinOrLose($game2);
+        $this->assertSame('win', $game2->getPlayers()[0]->getStatus());
+        $this->assertSame('win', $game2->getPlayers()[1]->getStatus());
+        $this->assertSame('win', $game2->getPlayers()[2]->getStatus());
+        $this->assertSame('burst', $game2->getPlayers()[3]->getStatus());
     }
 }

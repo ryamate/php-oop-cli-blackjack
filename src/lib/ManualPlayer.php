@@ -26,9 +26,9 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
         while ($this->getBets() === 0) {
             echo Message::getPlaceYourBetsMessage($this);
             $input = $this->selectBets();
-            $error = $this->validateInputBets($input);
+            $error = $this->validateInputBets($input, $this);
             if ($error === '') {
-                $this->changeBets($input);
+                $this->changeBets((int)$input);
                 echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL . PHP_EOL;
                 sleep(1);
             } else {

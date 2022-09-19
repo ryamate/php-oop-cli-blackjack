@@ -7,12 +7,11 @@ skinparam actorStyle awesome
 
 participant Main order 10
 participant Game order 20
-participant Message order 30
-actor Dealer order 40
+actor Dealer order 30
+participant Deck order 40
 actor "<<Manual>>\nPlayer" as mp order 50 #AliceBlue
 actor "<<Auto>>\nPlayer" as ap order 60 #LavenderBlush
-participant Deck order 70
-participant Card order 80
+participant Card order 70
 
 Main -> Game : Game を new する
 
@@ -34,12 +33,11 @@ end
 Main -> Game : ブラックジャックを\n開始する
 
 group #LightGoldenRodYellow ゲームの設定をする
-  Game -> Message : プレイヤー数を決める(メッセージ表示)
-  note over Message
-  ブラックジャックの設定をします。
-  プレイヤーの人数を入力してください。（1〜3）
-  🙋‍ 2
-  プレイヤー2名でゲームを開始します。
+  note right Game #Black
+  <font color="white">ブラックジャックの設定をします。
+  <font color="white">プレイヤーの人数を入力してください。（1〜3）
+  <font color="white">🙋‍ 2
+  <font color="white">プレイヤー2名でゲームを開始します。
   end note
 
   Game -> ap : 決めた人数の NPC を new する
@@ -47,12 +45,11 @@ group #LightGoldenRodYellow ゲームの設定をする
 end
 
 group #LightGoldenRodYellow ベットする額を決める
-  Game -> Message : ベットする額を決める(メッセージ表示)
-  note over Message
-  あなたの持っているチップは100ドルです。
-  ベットする額を入力してください。（1〜1000ドル）
-  💲 10
-  10ドルをベットしました。
+  note right Game #Black
+  <font color="white">あなたの持っているチップは100ドルです。
+  <font color="white">ベットする額を入力してください。（1〜1000ドル）
+  <font color="white">💲 10
+  <font color="white">10ドルをベットしました。
   end note
   Game -> mp : Player の ベットする額 を決めた額に変更する
 end
@@ -69,23 +66,20 @@ group #LightGoldenRodYellow チップを計算する
     Dealer -> mp : Player の合計チップ数を変更する
 
     alt 勝った人（ステータス → win）
-      Dealer ->  Message : メッセージを表示する
-      note over Message #Yellow
-        勝ったので 5 チップと同額の配当を得られます。
-        あなたのチップ残高は 105 ドルです。
+      note right Game #Black
+        <font color="white">勝ったので 5 チップと同額の配当を得られます。
+        <font color="white">あなたのチップ残高は 105 ドルです。
       end note
 
     else 負けた人（ステータス → lose）
-      Dealer ->  Message : メッセージを表示する
-      note over Message #Yellow
-        負けたため、チップ 5 ドルは没収されます。
-        あなたのチップ残高は 95 ドルです。
+      note right Game #Black
+        <font color="white">負けたため、チップ 5 ドルは没収されます。
+        <font color="white">あなたのチップ残高は 95 ドルです。
       end note
     else 引き分けた人（ステータス → draw）
-      Dealer ->  Message : メッセージを表示する
-      note over Message #Yellow
-        引き分けたため、チップ 5 ドルはそのままです。
-        あなたのチップ残高は 100 ドルです。
+      note right Game #Black
+        <font color="white">引き分けたため、チップ 5 ドルはそのままです。
+        <font color="white">あなたのチップ残高は 100 ドルです。
       end note
     end
 end
@@ -93,14 +87,12 @@ end
 group #LightGoldenRodYellow ゲームを続けるか、やめるかを選択する
 
     alt チップ残高がある場合
-      Game ->  Message : メッセージを表示する
-      note over Message #Yellow
-        ブラックジャックゲームを続けますか？（Y/N）
+      note right Game #Black
+        <font color="white">ブラックジャックゲームを続けますか？（Y/N）
       end note
     else チップ残高が 0 の場合
-      Game ->  Message : メッセージを表示する
-      note over Message #Yellow
-        あなたは、チップの残高がなくなりました。
+      note right Game #Black
+        <font color="white">あなたは、チップの残高がなくなりました。
       end note
     end
 end
