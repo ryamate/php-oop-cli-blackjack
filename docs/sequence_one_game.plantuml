@@ -5,14 +5,11 @@ title 別添「１ゲームの流れ」
 skinparam responseMessageBelowArrow true
 skinparam actorStyle awesome
 
-participant Main order 10
 participant Game order 20
-participant Message order 30
-actor Dealer order 40
+actor Dealer order 30
+participant Deck order 40
 actor "<<Manual>>\nPlayer" as mp order 50 #AliceBlue
 actor "<<Auto>>\nPlayer" as ap order 60 #LavenderBlush
-participant Deck order 70
-participant Card order 80
 
 group #LightGoldenRodYellow ゲームを開始する
   Game -> Dealer : デッキをシャッフルする

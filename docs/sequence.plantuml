@@ -9,9 +9,9 @@ participant Main order 10
 participant Game order 20
 actor Dealer order 30
 participant Deck order 40
-actor "<<Manual>>\nPlayer" as mp order 50 #AliceBlue
-actor "<<Auto>>\nPlayer" as ap order 60 #LavenderBlush
-participant Card order 70
+participant Card order 50
+actor "<<Manual>>\nPlayer" as mp order 60 #AliceBlue
+actor "<<Auto>>\nPlayer" as ap order 70 #LavenderBlush
 
 Main -> Game : Game を new する
 
