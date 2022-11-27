@@ -21,18 +21,19 @@ class ChipCalculator
             $chips = $player->getChips();
             if ($player->getStatus() === $player::WIN) {
                 $chips += $player->getBets();
-                echo $player->getName() . 'は勝ったため、チップ ' . $player->getBets() . ' ドルと同額の配当を得られます。' . PHP_EOL;
+                echo Message::getWinAndGetChipsMessage($player);
             } elseif ($player->getStatus() === $player::LOSE || $player->getStatus() === $player::BURST) {
                 $chips -= $player->getBets();
-                echo $player->getName() . 'は負けたため、チップ ' . $player->getBets() . ' ドルは没収されます。' . PHP_EOL;
+                echo Message::getLoseAndLoseChipsMessage($player);
             } elseif ($player->getStatus() === $player::DRAW) {
                 // チップ残高の変更なし
-                echo $player->getName() . 'は引き分けたため、チップ ' . $player->getBets() . ' ドルはそのままです。' . PHP_EOL;
+                echo Message::getDrawAndKeepChipsMessage($player);
             }
-            sleep(1);
+            sleep(Message::SECONDS_TO_DISPLAY);
+
             $player->changeChips($chips);
-            echo $player->getName() . 'のチップ残高は ' . $player->getChips() . ' ドルです。' . PHP_EOL;
-            sleep(1);
+            echo Message::getChipBalanceMessage($player);
+            sleep(Message::SECONDS_TO_DISPLAY);
             $player->reset();
         } elseif ($player->getSplitStatus() === $player::SPLIT_FIRST) {
             $this->calcChipsSplitFirstHand($player);
@@ -49,25 +50,27 @@ class ChipCalculator
      */
     private function calcChipsSplitFirstHand(Player $playerFirstHand)
     {
-        echo $playerFirstHand->getName() . 'は、スプリットを宣言しています。' . PHP_EOL;
+        echo Message::getSplitDeclarationMessage($playerFirstHand);
         $chips = $playerFirstHand->getChips();
         if ($playerFirstHand->getStatus() === $playerFirstHand::WIN) {
             $chips += $playerFirstHand->getBets();
-            echo '1 手目: 勝ったため、チップ ' . $playerFirstHand->getBets() . ' ドルと同額の配当を得られます。' . PHP_EOL;
+            echo Message::getWinAndGetChipsMessage($playerFirstHand);
         } elseif (
             $playerFirstHand->getStatus() === $playerFirstHand::LOSE ||
             $playerFirstHand->getStatus() === $playerFirstHand::BURST
         ) {
             $chips -= $playerFirstHand->getBets();
-            echo '1 手目: 負けたため、チップ ' . $playerFirstHand->getBets() . ' ドルは没収されます。' . PHP_EOL;
+            echo Message::getLoseAndLoseChipsMessage($playerFirstHand);
         } elseif ($playerFirstHand->getStatus() === $playerFirstHand::DRAW) {
             // チップ残高の変更なし
-            echo '1 手目: 引き分けたため、チップ ' . $playerFirstHand->getBets() . ' ドルはそのままです。' . PHP_EOL;
+            echo Message::getDrawAndKeepChipsMessage($playerFirstHand);
         }
-        sleep(1);
+        sleep(Message::SECONDS_TO_DISPLAY);
+
         $playerFirstHand->changeChips($chips);
-        echo $playerFirstHand->getName() . 'のチップ残高は ' . $playerFirstHand->getChips() . ' ドルです。' . PHP_EOL;
-        sleep(1);
+        echo Message::getChipBalanceMessage($playerFirstHand);
+        sleep(Message::SECONDS_TO_DISPLAY);
+
         $playerFirstHand->reset();
     }
 
@@ -88,21 +91,22 @@ class ChipCalculator
                 $chips = $player->getChips();
                 if ($playerSecondHand->getStatus() === $playerSecondHand::WIN) {
                     $chips += $playerSecondHand->getBets();
-                    echo '2 手目: 勝ったため、チップ ' . $playerSecondHand->getBets() . ' ドルと同額の配当を得られます。' . PHP_EOL;
+                    echo Message::getWinAndGetChipsMessage($playerSecondHand);
                 } elseif (
                     $playerSecondHand->getStatus() === $playerSecondHand::LOSE ||
                     $playerSecondHand->getStatus() === $playerSecondHand::BURST
                 ) {
                     $chips -= $playerSecondHand->getBets();
-                    echo '2 手目: 負けたため、チップ ' . $playerSecondHand->getBets() . ' ドルは没収されます。' . PHP_EOL;
+                    echo Message::getLoseAndLoseChipsMessage($playerSecondHand);
                 } elseif ($playerSecondHand->getStatus() === $playerSecondHand::DRAW) {
                     // チップ残高の変更なし
-                    echo '2 手目: 引き分けたため、チップ ' . $playerSecondHand->getBets() . ' ドルはそのままです。' . PHP_EOL;
+                    echo Message::getDrawAndKeepChipsMessage($playerSecondHand);
                 }
-                sleep(1);
+                sleep(Message::SECONDS_TO_DISPLAY);
+
                 $player->changeChips($chips);
-                echo $player->getName() . 'のチップ残高は ' . $player->getChips() . ' ドルです。' . PHP_EOL;
-                sleep(1);
+                echo Message::getChipBalanceMessage($playerSecondHand);
+                sleep(Message::SECONDS_TO_DISPLAY);
 
                 // スプリット宣言したプレイヤーのステータスリセット、2手目の削除
                 $player->changeSplitStatus($playerSecondHand::NO_SPLIT);

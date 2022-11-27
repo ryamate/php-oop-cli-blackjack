@@ -22,7 +22,7 @@ class DealerPlayer extends Player implements PlayerAction
     {
         while ($this->getStatus() === self::HIT) {
             echo Message::getScoreTotalMessage($this);
-            sleep(1);
+            sleep(Message::SECONDS_TO_DISPLAY);
             $inputYesOrNo = $this->selectHitOrStand();
 
             if ($inputYesOrNo === 'Y') {
@@ -30,12 +30,12 @@ class DealerPlayer extends Player implements PlayerAction
                 $game->getDealer()->getJudge()->checkBurst($this);
 
                 echo Message::getCardDrawnMessage($this);
-                sleep(1);
+                sleep(Message::SECONDS_TO_DISPLAY);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
 
-                echo 'カードを引きません。' . PHP_EOL . PHP_EOL;
-                sleep(1);
+                echo Message::getStopDrawingCardsMessage();
+                sleep(Message::SECONDS_TO_DISPLAY);
             }
         }
     }
