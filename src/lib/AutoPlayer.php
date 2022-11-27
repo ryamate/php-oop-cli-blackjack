@@ -31,8 +31,8 @@ class AutoPlayer extends Player implements PlayerAction, PlayerBet
         echo Message::getPlaceYourBetsMessage($this);
         $input = $this->selectBets();
         $this->changeBets((int)$input);
-        echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL . PHP_EOL;
-        sleep(1);
+        echo Message::getBetsResultMessage($this->getBets());
+        sleep(Message::SECONDS_TO_DISPLAY);
     }
 
     /**
@@ -58,7 +58,7 @@ class AutoPlayer extends Player implements PlayerAction, PlayerBet
     {
         while ($this->getStatus() === self::HIT) {
             echo Message::getScoreTotalMessage($this);
-            sleep(1);
+            sleep(Message::SECONDS_TO_DISPLAY);
             echo Message::getProgressQuestionMessage();
             $inputYesOrNo = $this->selectHitOrStand();
 
@@ -67,12 +67,12 @@ class AutoPlayer extends Player implements PlayerAction, PlayerBet
                 $game->getDealer()->getJudge()->checkBurst($this);
 
                 echo Message::getCardDrawnMessage($this);
-                sleep(1);
+                sleep(Message::SECONDS_TO_DISPLAY);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
 
-                echo 'カードを引きません。' . PHP_EOL . PHP_EOL;
-                sleep(1);
+                echo Message::getStopDrawingCardsMessage();
+                sleep(Message::SECONDS_TO_DISPLAY);
             }
         }
     }

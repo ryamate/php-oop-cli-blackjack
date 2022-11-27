@@ -33,25 +33,27 @@ class Judge
      */
     public function judgeWinOrLose(Game $game): void
     {
-        $dealersSecondCard = $game->getDealer()->getDealerPlayer()->getHand()[1];
-        echo 'ディーラーの引いた2枚目のカードは' . $dealersSecondCard['suit'] . 'の' . $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
-        sleep(1);
+        echo Message::getStandMessage($game->getDealer()->getDealerPlayer());
+        sleep(Message::SECONDS_TO_DISPLAY);
+
 
         if ($this->hasStand($game->getPlayers())) {
             $game->getDealer()->getDealerPlayer()->action($game);
 
             echo Message::getScoreTotalResultMessage($game->getDealer()->getDealerPlayer());
-            sleep(1);
+            sleep(Message::SECONDS_TO_DISPLAY);
+
 
             if ($game->getDealer()->getDealerPlayer()->getStatus() === Player::BURST) {
                 echo Message::getDealerBurstMessage();
-                sleep(1);
+                sleep(Message::SECONDS_TO_DISPLAY);
+
 
                 foreach ($game->getPlayers() as $player) {
                     if ($player->getStatus() === $player::STAND) {
                         $player->changeStatus($player::WIN);
                         echo Message::getWinByBurstMessage($player);
-                        sleep(1);
+                        sleep(Message::SECONDS_TO_DISPLAY);
                     }
                 }
             } else {
@@ -60,7 +62,7 @@ class Judge
                         $result = $this->compareScoreTotal($game->getDealer()->getDealerPlayer(), $player);
                         $player->changeStatus($result);
                         echo Message::getResultMessage($player);
-                        sleep(1);
+                        sleep(Message::SECONDS_TO_DISPLAY);
                     }
                 }
             }

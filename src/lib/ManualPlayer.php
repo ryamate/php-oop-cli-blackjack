@@ -29,8 +29,8 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
             $error = $this->validateInputBets($input, $this);
             if ($error === '') {
                 $this->changeBets((int)$input);
-                echo $this->getBets() . 'ドルをベットしました。' . PHP_EOL . PHP_EOL;
-                sleep(1);
+                echo Message::getBetsResultMessage($this->getBets());
+                sleep(Message::SECONDS_TO_DISPLAY);
             } else {
                 echo $error;
             }
@@ -58,7 +58,8 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
     {
         while ($this->getStatus() === self::HIT) {
             echo Message::getScoreTotalMessage($this);
-            sleep(1);
+            sleep(Message::SECONDS_TO_DISPLAY);
+
             echo Message::getProgressQuestionMessage();
             $inputYesOrNo = $this->selectHitOrStand();
 
@@ -67,20 +68,20 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
                 $game->getDealer()->getJudge()->checkBurst($this);
 
                 echo Message::getCardDrawnMessage($this);
-                sleep(1);
+                sleep(Message::SECONDS_TO_DISPLAY);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
 
-                echo 'カードを引きません。' . PHP_EOL . PHP_EOL;
-                sleep(1);
+                echo Message::getStopDrawingCardsMessage();
+                sleep(Message::SECONDS_TO_DISPLAY);
             } elseif (count($this->getHand()) === $game->getDealer()::NUM_OF_FIRST_HAND) {
                 $message = $game->getDealer()->getSpecialRule()->applySpecialRule($inputYesOrNo, $game, $this);
 
                 echo $message;
-                sleep(1);
+                sleep(Message::SECONDS_TO_DISPLAY);
             } else {
-                echo 'Y/N（DD/SP/SR は、最初に手札が配られたときのみ）を入力してください。' . PHP_EOL . PHP_EOL;
-                sleep(1);
+                echo Message::getInputErrorMessage();
+                sleep(Message::SECONDS_TO_DISPLAY);
             }
         }
     }
