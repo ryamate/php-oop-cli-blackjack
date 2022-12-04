@@ -194,7 +194,7 @@ class Game
     {
         foreach ($this->players as $player) {
             $player->action($this);
-            if ($player->getStatus() === Player::BURST) {
+            if ($player->hasBurstStatus()) {
                 echo Message::getLoseByBurstMessage($player);
                 sleep(Message::SECONDS_TO_DISPLAY);
             }

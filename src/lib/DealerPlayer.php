@@ -20,7 +20,7 @@ class DealerPlayer extends Player implements PlayerAction
      */
     public function action(Game $game): void
     {
-        while ($this->getStatus() === self::HIT) {
+        while ($this->hasHitStatus()) {
             echo Message::getScoreTotalMessage($this);
             sleep(Message::SECONDS_TO_DISPLAY);
             $inputYesOrNo = $this->selectHitOrStand();
