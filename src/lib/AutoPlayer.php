@@ -56,7 +56,7 @@ class AutoPlayer extends Player implements PlayerAction, PlayerBet
      */
     public function action(Game $game): void
     {
-        while ($this->getStatus() === self::HIT) {
+        while ($this->hasHitStatus()) {
             echo Message::getScoreTotalMessage($this);
             sleep(Message::SECONDS_TO_DISPLAY);
             echo Message::getProgressQuestionMessage();

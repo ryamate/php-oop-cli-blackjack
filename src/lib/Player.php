@@ -213,6 +213,45 @@ abstract class Player
     }
 
     /**
+     * ステータスがヒットであるか否かを判定する
+     *
+     * @return boolean
+     */
+    public function hasHitStatus(): bool
+    {
+        if ($this->getStatus() === self::HIT) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * ステータスがスタンドであるか否かを判定する
+     *
+     * @return boolean
+     */
+    public function hasStandStatus(): bool
+    {
+        if ($this->getStatus() === self::STAND) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * ステータスがバーストであるか否かを判定する
+     *
+     * @return boolean
+     */
+    public function hasBurstStatus(): bool
+    {
+        if ($this->getStatus() === self::BURST) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * １ゲーム終了後に初期化をする
      *
      * @return void

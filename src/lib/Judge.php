@@ -44,12 +44,12 @@ class Judge
             sleep(Message::SECONDS_TO_DISPLAY);
 
 
-            if ($game->getDealer()->getDealerPlayer()->getStatus() === Player::BURST) {
+            if ($game->getDealer()->getDealerPlayer()->hasBurstStatus()) {
                 echo Message::getDealerBurstMessage();
                 sleep(Message::SECONDS_TO_DISPLAY);
 
                 foreach ($game->getPlayers() as $player) {
-                    if ($player->getStatus() === $player::STAND) {
+                    if ($player->hasStandStatus()) {
                         $player->changeStatus($player::WIN);
                         echo Message::getWinByBurstMessage($player);
                         sleep(Message::SECONDS_TO_DISPLAY);
@@ -57,7 +57,7 @@ class Judge
                 }
             } else {
                 foreach ($game->getPlayers() as $player) {
-                    if ($player->getStatus() === $player::STAND) {
+                    if ($player->hasStandStatus()) {
                         $result = $this->compareScoreTotal($game->getDealer()->getDealerPlayer(), $player);
                         $player->changeStatus($result);
                         echo Message::getResultMessage($player);
@@ -77,7 +77,7 @@ class Judge
     private function hasStand(array $players): bool
     {
         foreach ($players as $player) {
-            if ($player->getStatus() === $player::STAND) {
+            if ($player->hasStandStatus()) {
                 return true;
             }
         }

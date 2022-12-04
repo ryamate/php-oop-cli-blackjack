@@ -89,7 +89,7 @@ class SpecialRule
         $dealer->dealOneCard($deck, $player);
         $dealer->getJudge()->checkBurst($player);
         $message .= Message::getCardDrawnMessage($player);
-        if ($player->getStatus() === $player::STAND) {
+        if ($player->hasStandStatus()) {
             $message .= Message::getScoreTotalMessage($player);
         }
         return $message;
@@ -130,7 +130,7 @@ class SpecialRule
 
             foreach ([$player, $secondPlayer] as $playerAfterSplit) {
                 // 一度だけ、HITかSTANDかを選択する
-                while ($playerAfterSplit->getStatus() === $player::HIT) {
+                while ($playerAfterSplit->hasHitStatus()) {
                     echo $playerAfterSplit->getSplitStatus() . ' 手目: ' . 'カードを引きますか？（Y/N）' . PHP_EOL;
                     $inputYesOrNo = $playerAfterSplit->selectHitOrStand();
                     $error = $this->validateInputYesOrNo($inputYesOrNo);
