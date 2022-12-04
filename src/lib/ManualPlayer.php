@@ -63,26 +63,22 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
             echo Message::getProgressQuestionMessage();
             $inputYesOrNo = $this->selectHitOrStand();
 
+            if ($game->getDealer()->isFirstHand($this->getHand())) {
+                $message = $game->getDealer()->getSpecialRule()->applySpecialRule($inputYesOrNo, $game, $this);
+            }
+
             if ($inputYesOrNo === 'Y') {
                 $game->getDealer()->dealOneCard($game->getDeck(), $this);
                 $game->getDealer()->getJudge()->checkBurst($this);
-
-                echo Message::getCardDrawnMessage($this);
-                sleep(Message::SECONDS_TO_DISPLAY);
+                $message = Message::getCardDrawnMessage($this);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
-
-                echo Message::getStopDrawingCardsMessage();
-                sleep(Message::SECONDS_TO_DISPLAY);
-            } elseif (count($this->getHand()) === $game->getDealer()::NUM_OF_FIRST_HAND) {
-                $message = $game->getDealer()->getSpecialRule()->applySpecialRule($inputYesOrNo, $game, $this);
-
-                echo $message;
-                sleep(Message::SECONDS_TO_DISPLAY);
-            } else {
-                echo Message::getInputErrorMessage();
-                sleep(Message::SECONDS_TO_DISPLAY);
+                $message = Message::getStopDrawingCardsMessage();
+            } elseif (!$game->getDealer()->getSpecialRule()->isSpecialRule($inputYesOrNo)) {
+                $message = Message::getInputErrorMessage();
             }
+            echo $message;
+            sleep(Message::SECONDS_TO_DISPLAY);
         }
     }
 
@@ -93,7 +89,6 @@ class ManualPlayer extends Player implements PlayerAction, PlayerBet
      */
     public function selectHitOrStand(): string
     {
-        $inputYesOrNo = trim(fgets(STDIN));
-        return $inputYesOrNo;
+        return trim(fgets(STDIN));
     }
 }

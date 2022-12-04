@@ -10,6 +10,11 @@ class SpecialRule
 {
     use Validator;
 
+
+    public const DOUBLE_DOWN = 'DD';
+    public const SPLIT = 'SP';
+    public const SURRENDER = 'SR';
+
     /**
      * 特殊ルールを適用する
      *
@@ -21,20 +26,43 @@ class SpecialRule
     public function applySpecialRule(string $inputYesOrNo, Game $game, ManualPlayer|AutoPlayer $player): string
     {
         $message = '';
-        if ($inputYesOrNo === 'DD') {
-            $message = $this->doubleDown(
-                $game->getDeck(),
-                $game->getDealer(),
-                $player
-            );
-        } elseif ($inputYesOrNo === 'SP') {
-            $message = $this->split($game, $player);
-        } elseif ($inputYesOrNo === 'SR') {
-            $message = $this->surrender($player);
-        } else {
-            $message .= 'Y/N（DD/SP/SR は、最初に手札が配られたときのみ）を入力してください。' . PHP_EOL;
+        switch ($inputYesOrNo) {
+            case self::DOUBLE_DOWN:
+                $message = $this->doubleDown(
+                    $game->getDeck(),
+                    $game->getDealer(),
+                    $player
+                );
+                break;
+            case self::SPLIT:
+                $message = $this->split($game, $player);
+                break;
+            case self::SURRENDER:
+                $message = $this->surrender($player);
+                break;
+            default:
+                $message .= Message::getInputErrorMessage();
+                break;
         }
         return $message;
+    }
+
+    /**
+     * 入力値が特殊ルールであるかどうかを判定する
+     *
+     * @param string $inputYesOrNo
+     * @return boolean
+     */
+    public function isSpecialRule(string $inputYesOrNo): bool
+    {
+        if (
+            $inputYesOrNo === self::DOUBLE_DOWN ||
+            $inputYesOrNo === self::SPLIT ||
+            $inputYesOrNo === self::SURRENDER
+        ) {
+            return true;
+        }
+        return false;
     }
 
     /**
