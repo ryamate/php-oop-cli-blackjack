@@ -84,6 +84,20 @@ class Dealer
     }
 
     /**
+     * 手札の枚数が初めの2枚か
+     *
+     * @param array<int,array<string,int|string>> $hand 手札
+     * @return bool
+     */
+    public function isFirstHand(array $hand): bool
+    {
+        if (count($hand) === self::NUM_OF_FIRST_HAND) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * カードを1枚配る（デッキからカードを1枚引いて、プレイヤーの手札に加える）
      *
      * @param Deck $deck

@@ -17,102 +17,149 @@ class ChipCalculator
      */
     public function calcChips(Game $game, Player $player): void
     {
-        if ($player->getSplitStatus() === $player::NO_SPLIT) {
-            $chips = $player->getChips();
-            if ($player->getStatus() === $player::WIN) {
-                $chips += $player->getBets();
-                echo Message::getWinAndGetChipsMessage($player);
-            } elseif ($player->getStatus() === $player::LOSE || $player->getStatus() === $player::BURST) {
-                $chips -= $player->getBets();
-                echo Message::getLoseAndLoseChipsMessage($player);
-            } elseif ($player->getStatus() === $player::DRAW) {
-                // チップ残高の変更なし
-                echo Message::getDrawAndKeepChipsMessage($player);
-            }
-            sleep(Message::SECONDS_TO_DISPLAY);
-
-            $player->changeChips($chips);
-            echo Message::getChipBalanceMessage($player);
-            sleep(Message::SECONDS_TO_DISPLAY);
-            $player->reset();
-        } elseif ($player->getSplitStatus() === $player::SPLIT_FIRST) {
-            $this->calcChipsSplitFirstHand($player);
-        } elseif ($player->getSplitStatus() === $player::SPLIT_SECOND) {
-            $this->calcChipsSplitSecondHand($game, $player);
+        switch ($player->getSplitStatus()) {
+            case $player::NO_SPLIT:
+                $chipsByResult = $this->calcChipsByResult($player);
+                $player->changeChips($chipsByResult);
+                $this->displayMessageByResult($player);
+                $player->reset();
+                break;
+            case $player::SPLIT_FIRST:
+                echo Message::getSplitDeclarationMessage($player);
+                $chipsByResult = $this->calcChipsByResult($player);
+                $player->changeChips($chipsByResult);
+                $this->displayMessageByResult($player);
+                $player->reset();
+                break;
+            case $player::SPLIT_SECOND:
+                $this->calcChipsSplitSecondHand($game, $player);
+                $this->resetStatusSplitPlayer($game, $player);
+                $this->removePlayerSecondHand($game, $player);
+                break;
         }
     }
 
     /**
-     * スプリット宣言プレイヤー(splitStatus: 1) について
+     * 結果別でチップを計算する
      *
-     * @param Player $playerFirstHand
+     * @param Player $player
+     * @return integer $chipsByResult
+     */
+    private function calcChipsByResult(Player $player): int
+    {
+        $chips = $player->getChips();
+
+        switch ($player->getStatus()) {
+            case $player::WIN:
+                $chipsByResult = $chips + $player->getBets();
+                break;
+            case $player::LOSE:
+            case $player::BURST:
+                $chipsByResult = $chips - $player->getBets();
+                break;
+            case $player::DRAW:
+                $chipsByResult = $chips;
+                break;
+        }
+        return $chipsByResult;
+    }
+
+    /**
+     * 結果別でメッセージを表示する
+     *
+     * @param Player $player
      * @return void
      */
-    private function calcChipsSplitFirstHand(Player $playerFirstHand)
+    private function displayMessageByResult(Player $player): void
     {
-        echo Message::getSplitDeclarationMessage($playerFirstHand);
-        $chips = $playerFirstHand->getChips();
-        if ($playerFirstHand->getStatus() === $playerFirstHand::WIN) {
-            $chips += $playerFirstHand->getBets();
-            echo Message::getWinAndGetChipsMessage($playerFirstHand);
-        } elseif (
-            $playerFirstHand->getStatus() === $playerFirstHand::LOSE ||
-            $playerFirstHand->getStatus() === $playerFirstHand::BURST
-        ) {
-            $chips -= $playerFirstHand->getBets();
-            echo Message::getLoseAndLoseChipsMessage($playerFirstHand);
-        } elseif ($playerFirstHand->getStatus() === $playerFirstHand::DRAW) {
-            // チップ残高の変更なし
-            echo Message::getDrawAndKeepChipsMessage($playerFirstHand);
+        switch ($player->getStatus()) {
+            case $player::WIN:
+                echo Message::getWinAndGetChipsMessage($player);
+                break;
+            case $player::LOSE:
+            case $player::BURST:
+                echo Message::getLoseAndLoseChipsMessage($player);
+                break;
+            case $player::DRAW:
+                echo Message::getDrawAndKeepChipsMessage($player);
+                break;
         }
         sleep(Message::SECONDS_TO_DISPLAY);
-
-        $playerFirstHand->changeChips($chips);
-        echo Message::getChipBalanceMessage($playerFirstHand);
+        echo Message::getChipBalanceMessage($player);
         sleep(Message::SECONDS_TO_DISPLAY);
-
-        $playerFirstHand->reset();
     }
 
     /**
-     * スプリット宣言プレイヤーの2手目(splitStatus: 2) について
+     * スプリット宣言プレイヤーの2手目(splitStatus: 2) について、チップ残高を算出する
      *
+     * @param Game $game
      * @param Player $playerSecondHand
      * @return void
      */
-    private function calcChipsSplitSecondHand(Game $game, Player $playerSecondHand)
+    private function calcChipsSplitSecondHand(Game $game, Player $playerSecondHand): void
     {
         foreach ($game->getPlayers() as $player) {
-            if (
-                $player->getName() === $playerSecondHand->getName() &&
-                $player->getSplitStatus() === $playerSecondHand::SPLIT_FIRST &&
-                $playerSecondHand->getSplitStatus() === $playerSecondHand::SPLIT_SECOND
-            ) {
-                $chips = $player->getChips();
-                if ($playerSecondHand->getStatus() === $playerSecondHand::WIN) {
-                    $chips += $playerSecondHand->getBets();
-                    echo Message::getWinAndGetChipsMessage($playerSecondHand);
-                } elseif (
-                    $playerSecondHand->getStatus() === $playerSecondHand::LOSE ||
-                    $playerSecondHand->getStatus() === $playerSecondHand::BURST
-                ) {
-                    $chips -= $playerSecondHand->getBets();
-                    echo Message::getLoseAndLoseChipsMessage($playerSecondHand);
-                } elseif ($playerSecondHand->getStatus() === $playerSecondHand::DRAW) {
-                    // チップ残高の変更なし
-                    echo Message::getDrawAndKeepChipsMessage($playerSecondHand);
-                }
-                sleep(Message::SECONDS_TO_DISPLAY);
+            if ($this->isSplitFirstHand($player, $playerSecondHand)) {
+                $chipsByResult = $this->calcChipsByResult($player);
+                $player->changeChips($chipsByResult);
+                $this->displayMessageByResult($player);
 
-                $player->changeChips($chips);
-                echo Message::getChipBalanceMessage($playerSecondHand);
-                sleep(Message::SECONDS_TO_DISPLAY);
-
-                // スプリット宣言したプレイヤーのステータスリセット、2手目の削除
-                $player->changeSplitStatus($playerSecondHand::NO_SPLIT);
                 $game->removeSplitPlayer($playerSecondHand);
                 break;
             }
         }
+    }
+
+    /**
+     * スプリット宣言したプレイヤーのステータスをリセット削除する
+     *
+     * @param Game $game
+     * @param Player $playerSecondHand
+     * @return void
+     */
+    private function resetStatusSplitPlayer(Game $game, Player $playerSecondHand): void
+    {
+        foreach ($game->getPlayers() as $player) {
+            if ($this->isSplitFirstHand($player, $playerSecondHand)) {
+                $player->changeSplitStatus($player::NO_SPLIT);
+                break;
+            }
+        }
+    }
+
+    /**
+     * スプリット宣言したプレイヤーの 2 手目を削除する
+     *
+     * @param Game $game
+     * @param Player $playerSecondHand
+     * @return void
+     */
+    private function removePlayerSecondHand(Game $game, Player $playerSecondHand): void
+    {
+        foreach ($game->getPlayers() as $player) {
+            if ($this->isSplitFirstHand($player, $playerSecondHand)) {
+                $game->removeSplitPlayer($playerSecondHand);
+                break;
+            }
+        }
+    }
+
+    /**
+     * $player が、スプリット宣言プレイヤーの 1 手目か否かを判定する
+     *
+     * @param Player $player
+     * @param Player $playerSecondHand
+     * @return boolean
+     */
+    private function isSplitFirstHand(Player $player, Player $playerSecondHand): bool
+    {
+        if (
+            $player->getName() === $playerSecondHand->getName() &&
+            $player->getSplitStatus() === $playerSecondHand::SPLIT_FIRST &&
+            $playerSecondHand->getSplitStatus() === $playerSecondHand::SPLIT_SECOND
+        ) {
+            return true;
+        }
+        return false;
     }
 }

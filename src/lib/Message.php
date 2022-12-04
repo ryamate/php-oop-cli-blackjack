@@ -245,17 +245,16 @@ class Message
      */
     public static function getWinByBurstMessage(Player $player): string
     {
-        $message = '';
-        $splitStatus = $player->getSplitStatus();
         $playerName = $player->getName();
-        if ($splitStatus === $player::NO_SPLIT) {
-            $message = $playerName . 'の勝ちです！🎉' . PHP_EOL;
-        } elseif ($splitStatus === $player::SPLIT_FIRST) {
-            $message = $playerName . '(1手目)の勝ちです！🎉' . PHP_EOL;
-        } elseif ($splitStatus === $player::SPLIT_SECOND) {
-            $message = $playerName . '(2手目)の勝ちです！🎉' . PHP_EOL;
+        switch ($player->getSplitStatus()) {
+            case $player::SPLIT_FIRST:
+                $playerName .= '(1手目)';
+                break;
+            case $player::SPLIT_SECOND:
+                $playerName .= '(2手目)';
+                break;
         }
-        return $message;
+        return $playerName . 'の勝ちです！🎉' . PHP_EOL;
     }
 
     /**
@@ -267,21 +266,26 @@ class Message
     public static function getResultMessage(Player $player): string
     {
         $message = '';
-        $status = $player->getStatus();
-        $splitStatus = $player->getSplitStatus();
         $playerName = $player->getName();
-        if ($splitStatus === $player::SPLIT_FIRST) {
-            $playerName = $playerName . '(1手目)';
-        } elseif ($splitStatus === $player::SPLIT_SECOND) {
-            $playerName = $playerName . '(2手目)';
+        switch ($player->getSplitStatus()) {
+            case $player::SPLIT_FIRST:
+                $playerName .= '(1手目)';
+                break;
+            case $player::SPLIT_SECOND:
+                $playerName .= '(2手目)';
+                break;
         }
 
-        if ($status === $player::WIN) {
-            $message = $playerName . 'の勝ちです！🎉' . PHP_EOL;
-        } elseif ($status === $player::LOSE) {
-            $message = $playerName . 'の負けです…' . PHP_EOL;
-        } elseif ($status === $player::DRAW) {
-            $message = $playerName . 'は引き分けです。' . PHP_EOL;
+        switch ($player->getStatus()) {
+            case $player::WIN:
+                $message = $playerName . 'の勝ちです！🎉' . PHP_EOL;
+                break;
+            case $player::LOSE:
+                $message = $playerName . 'の負けです…' . PHP_EOL;
+                break;
+            case $player::DRAW:
+                $message = $playerName . 'は引き分けです。' . PHP_EOL;
+                break;
         }
         return $message;
     }
@@ -295,12 +299,16 @@ class Message
     public static function getWinAndGetChipsMessage(Player $player): string
     {
         $message = '';
-        if ($player->getSplitStatus() === 0) {
-            $message .= $player->getName() . 'は';
-        } elseif ($player->getSplitStatus() === 1) {
-            $message .= '1 手目: ';
-        } elseif ($player->getSplitStatus() === 2) {
-            $message .= '2 手目: ';
+        switch ($player->getSplitStatus()) {
+            case 0:
+                $message .= $player->getName() . 'は';
+                break;
+            case 1:
+                $message .= '1 手目: ';
+                break;
+            case 2:
+                $message .= '2 手目: ';
+                break;
         }
         $message .= 'は勝ったため、チップ ' . $player->getBets() . ' ドルと同額の配当を得られます。' . PHP_EOL;
 
@@ -316,12 +324,16 @@ class Message
     public static function getLoseAndLoseChipsMessage(Player $player): string
     {
         $message = '';
-        if ($player->getSplitStatus() === 0) {
-            $message .= $player->getName() . 'は';
-        } elseif ($player->getSplitStatus() === 1) {
-            $message .= '1 手目: ';
-        } elseif ($player->getSplitStatus() === 2) {
-            $message .= '2 手目: ';
+        switch ($player->getSplitStatus()) {
+            case 0:
+                $message .= $player->getName() . 'は';
+                break;
+            case 1:
+                $message .= '1 手目: ';
+                break;
+            case 2:
+                $message .= '2 手目: ';
+                break;
         }
         $message .= '負けたため、チップ ' . $player->getBets() . ' ドルは没収されます。' . PHP_EOL;
 
@@ -337,12 +349,16 @@ class Message
     public static function getDrawAndKeepChipsMessage(Player $player): string
     {
         $message = '';
-        if ($player->getSplitStatus() === 0) {
-            $message .= $player->getName() . 'は';
-        } elseif ($player->getSplitStatus() === 1) {
-            $message .= '1 手目: ';
-        } elseif ($player->getSplitStatus() === 2) {
-            $message .= '2 手目: ';
+        switch ($player->getSplitStatus()) {
+            case 0:
+                $message .= $player->getName() . 'は';
+                break;
+            case 1:
+                $message .= '1 手目: ';
+                break;
+            case 2:
+                $message .= '2 手目: ';
+                break;
         }
         $message .= '引き分けたため、チップ ' . $player->getBets() . ' ドルはそのままです。' . PHP_EOL;
 

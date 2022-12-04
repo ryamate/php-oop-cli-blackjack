@@ -48,7 +48,6 @@ class Judge
                 echo Message::getDealerBurstMessage();
                 sleep(Message::SECONDS_TO_DISPLAY);
 
-
                 foreach ($game->getPlayers() as $player) {
                     if ($player->getStatus() === $player::STAND) {
                         $player->changeStatus($player::WIN);

@@ -25,18 +25,17 @@ class DealerPlayer extends Player implements PlayerAction
             sleep(Message::SECONDS_TO_DISPLAY);
             $inputYesOrNo = $this->selectHitOrStand();
 
+            $message = '';
             if ($inputYesOrNo === 'Y') {
                 $game->getDealer()->dealOneCard($game->getDeck(), $this);
                 $game->getDealer()->getJudge()->checkBurst($this);
-
-                echo Message::getCardDrawnMessage($this);
-                sleep(Message::SECONDS_TO_DISPLAY);
+                $message = Message::getCardDrawnMessage($this);
             } elseif ($inputYesOrNo === 'N') {
                 $this->changeStatus(self::STAND);
-
-                echo Message::getStopDrawingCardsMessage();
-                sleep(Message::SECONDS_TO_DISPLAY);
+                $message = Message::getStopDrawingCardsMessage();
             }
+            echo $message;
+            sleep(Message::SECONDS_TO_DISPLAY);
         }
     }
 
