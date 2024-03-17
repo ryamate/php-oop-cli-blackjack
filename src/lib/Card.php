@@ -4,12 +4,20 @@ namespace Blackjack;
 
 /**
  * カードクラス
+ * 
+ * このクラスはブラックジャックのカードを表現します。
  */
 class Card
 {
-    /**  array<string,int> 各カードの点数 */
+    /** 
+     * @var array<string,int> 各カードの点数 
+     * 
+     * 2から9までは、書かれている数の通りの点数
+     * 10,J,Q,Kは10点
+     * Aは1点あるいは11点として、手の点数が最大となる方で数える（初期値 11 にする）
+     */
     private const CARD_SCORE = [
-        '2' => 2, // 2から9までは、書かれている数の通りの点数
+        '2' => 2,
         '3' => 3,
         '4' => 4,
         '5' => 5,
@@ -17,25 +25,30 @@ class Card
         '7' => 7,
         '8' => 8,
         '9' => 9,
-        '10' => 10, // 10,J,Q,Kは10点
+        '10' => 10,
         'J' => 10,
         'Q' => 10,
         'K' => 10,
-        'A' => 11, // Aは1点あるいは11点として、手の点数が最大となる方で数える（初期値 11 にする）
+        'A' => 11,
     ];
 
-    /** array<int,string> 各カードのマーク */
+    /** 
+     * @var array<int,string> 各カードのマーク 
+     * '♠', '♥', '♦', '♣'の4種類のマークが存在します。
+     */
     private const SUITS = [
-        'スペード',
-        'ハート',
-        'ダイヤ',
-        'クラブ',
+        '♠',
+        '♥',
+        '♦',
+        '♣',
     ];
 
     /**
      * 新しくデッキを作成する
      *
-     * @return array<int,array<string,int|string>> $deck デッキ
+     * @return array<int,array<string,int|string>> デッキ
+     * 
+     * 各カードは'suit'（マーク）, 'num'（数字）, 'score'（点数）の3つの属性を持つ配列として表現されます。
      */
     public function createNewDeck(): array
     {

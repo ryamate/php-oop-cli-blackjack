@@ -7,17 +7,26 @@ namespace Blackjack;
  */
 abstract class Player
 {
+    /** @var string ヒット */
     public const HIT = 'hit';
+    /** @var string スタンド */
     public const STAND = 'stand';
+    /** @var string バースト */
     public const BURST = 'burst';
 
+    /** @var string 勝ち */
     public const WIN = 'win';
+    /** @var string 負け */
     public const LOSE = 'lose';
+    /** @var string 引き分け */
     public const DRAW = 'draw';
 
-    public const NO_SPLIT = 0; // 宣言なし
-    public const SPLIT_FIRST = 1; // スプリット宣言 1 手目
-    public const SPLIT_SECOND = 2; // スプリット宣言 2 手目
+    /** @var int 宣言なし */
+    public const NO_SPLIT = 0;
+    /** @var int スプリット宣言 1 手目 */
+    public const SPLIT_FIRST = 1;
+    /** @var int スプリット宣言 2 手目 */
+    public const SPLIT_SECOND = 2;
 
 
     /**

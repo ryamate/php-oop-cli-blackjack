@@ -25,26 +25,20 @@ class SpecialRule
      */
     public function applySpecialRule(string $inputYesOrNo, Game $game, ManualPlayer|AutoPlayer $player): string
     {
-        $message = '';
         switch ($inputYesOrNo) {
             case self::DOUBLE_DOWN:
-                $message = $this->doubleDown(
+                return $this->doubleDown(
                     $game->getDeck(),
                     $game->getDealer(),
                     $player
                 );
-                break;
             case self::SPLIT:
-                $message = $this->split($game, $player);
-                break;
+                return $this->split($game, $player);
             case self::SURRENDER:
-                $message = $this->surrender($player);
-                break;
+                return $this->surrender($player);
             default:
-                $message .= Message::getInputErrorMessage();
-                break;
+                return Message::getInputErrorMessage();
         }
-        return $message;
     }
 
     /**
