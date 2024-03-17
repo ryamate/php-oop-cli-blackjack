@@ -5,7 +5,6 @@ namespace Blackjack;
 require_once('Deck.php');
 require_once('Player.php');
 
-use Blackjack\Deck;
 use Blackjack\Player;
 
 class Judge
@@ -28,7 +27,7 @@ class Judge
     /**
      * 勝敗を判定する
      *
-     * @param Game $game
+     * @param Game $game ゲームの状態を含むGameオブジェクト
      * @return void
      */
     public function judgeWinOrLose(Game $game): void
@@ -36,37 +35,45 @@ class Judge
         echo Message::getStandMessage($game->getDealer()->getDealerPlayer());
         sleep(Message::SECONDS_TO_DISPLAY);
 
+        // スタンド状態のプレイヤーがいなければ早期リターン
+        if (!$this->hasStand($game->getPlayers())) {
+            return;
+        }
 
-        if ($this->hasStand($game->getPlayers())) {
-            $game->getDealer()->getDealerPlayer()->action($game);
+        $game->getDealer()->getDealerPlayer()->action($game);
+        echo Message::getScoreTotalResultMessage($game->getDealer()->getDealerPlayer());
+        sleep(Message::SECONDS_TO_DISPLAY);
 
-            echo Message::getScoreTotalResultMessage($game->getDealer()->getDealerPlayer());
+        // ディーラーのバースト状態をチェック
+        $dealerBurst = $game->getDealer()->getDealerPlayer()->hasBurstStatus();
+        if ($dealerBurst) {
+            echo Message::getDealerBurstMessage();
             sleep(Message::SECONDS_TO_DISPLAY);
+        }
 
-
-            if ($game->getDealer()->getDealerPlayer()->hasBurstStatus()) {
-                echo Message::getDealerBurstMessage();
-                sleep(Message::SECONDS_TO_DISPLAY);
-
-                foreach ($game->getPlayers() as $player) {
-                    if ($player->hasStandStatus()) {
-                        $player->changeStatus($player::WIN);
-                        echo Message::getWinByBurstMessage($player);
-                        sleep(Message::SECONDS_TO_DISPLAY);
-                    }
-                }
-            } else {
-                foreach ($game->getPlayers() as $player) {
-                    if ($player->hasStandStatus()) {
-                        $result = $this->compareScoreTotal($game->getDealer()->getDealerPlayer(), $player);
-                        $player->changeStatus($result);
-                        echo Message::getResultMessage($player);
-                        sleep(Message::SECONDS_TO_DISPLAY);
-                    }
-                }
+        // すべてのプレイヤーに対して処理を行う
+        foreach ($game->getPlayers() as $player) {
+            // スタンド状態でなければ次のプレイヤーへ
+            if (!$player->hasStandStatus()) {
+                continue;
             }
+
+            // ディーラーがバーストしていれば、プレイヤーは勝利
+            if ($dealerBurst) {
+                $player->changeStatus($player::WIN);
+                echo Message::getWinByBurstMessage($player);
+                continue;
+            }
+
+            // ディーラーがバーストしていなければ、スコアを比較
+            $result = $this->compareScoreTotal($game->getDealer()->getDealerPlayer(), $player);
+            $player->changeStatus($result);
+            echo Message::getResultMessage($player);
+            
+            sleep(Message::SECONDS_TO_DISPLAY);
         }
     }
+
 
     /**
      * スタンドのプレイヤーがいるかについて、 bool を返す
@@ -92,16 +99,16 @@ class Judge
      */
     private function compareScoreTotal(DealerPlayer $dealerPlayer, Player $player): string
     {
-        $result = '';
         $playerScoreTotal = $player->getScoreTotal();
         $dealerScoreTotal = $dealerPlayer->getScoreTotal();
         if ($playerScoreTotal > $dealerScoreTotal) {
-            $result = $player::WIN;
-        } elseif ($playerScoreTotal < $dealerScoreTotal) {
-            $result = $player::LOSE;
-        } elseif ($playerScoreTotal === $dealerScoreTotal) {
-            $result = $player::DRAW;
+            return $player::WIN;
+        } 
+        if ($playerScoreTotal < $dealerScoreTotal) {
+            return $player::LOSE;
+        } 
+        if ($playerScoreTotal === $dealerScoreTotal) {
+            return $player::DRAW;
         }
-        return $result;
     }
 }
