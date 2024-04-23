@@ -3,8 +3,12 @@
 namespace Blackjack;
 
 require_once('Card.php');
+require_once('CardSuit.php');
+require_once('CardNumber.php');
 
 use Blackjack\Card;
+use Blackjack\CardSuit;
+use Blackjack\CardNumber;
 
 /**
  * デッキクラス
@@ -14,7 +18,7 @@ class Deck
     /**
      * コンストラクタ
      *
-     * @param array<int,array<string,int|string>> $deck デッキ
+     * @param array<Card> $deck デッキ
      */
     public function __construct(
         private array $deck = []
@@ -22,35 +26,52 @@ class Deck
     }
 
     /**
-     * deck プロパティを返す
+     * デッキを作成する
      *
-     * @return array<int,array<string,int|string>> $deck デッキ
+     * @return Deck
+     */
+    public function createDeck(): Deck
+    {
+        $newDeck = [];
+        $suits = ['♠', '♥', '♦', '♣'];
+        $numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+        foreach ($suits as $suitStr) {
+            $suit = new CardSuit($suitStr);
+            foreach ($numbers as $numberStr) {
+                $number = new CardNumber($numberStr);
+                $newDeck[] = new Card($suit, $number);
+            }
+        }
+
+        return new self($newDeck);
+    }
+
+    /**
+     * デッキをシャッフルする
+     */
+    public function shuffleDeck(): void
+    {
+        shuffle($this->deck);
+    }
+
+    /**
+     * デッキからカードを１枚取る
+     *
+     * @return Card カード
+     */
+    public function takeCard(): Card
+    {
+        return array_shift($this->deck);
+    }
+
+    /**
+     * deckプロパティを返す
+     *
+     * @return array<Card> デッキ
      */
     public function getDeck(): array
     {
         return $this->deck;
-    }
-
-    /**
-     * デッキを初期化する
-     *
-     * @return array<int,array<string,int|string>> $deck デッキ
-     */
-    public function initDeck(): array
-    {
-        $card = new Card();
-        $this->deck = $card->createNewDeck();
-        shuffle($this->deck);
-        return $this->deck;
-    }
-
-    /**
-     * デッキから、プレイヤーが引いたカードを１枚除く
-     *
-     * @return void
-     */
-    public function takeACard(): void
-    {
-        $this->deck = array_slice($this->deck, 1);
     }
 }

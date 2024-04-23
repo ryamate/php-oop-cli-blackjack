@@ -4,64 +4,66 @@ namespace Blackjack;
 
 /**
  * カードクラス
- * 
- * このクラスはブラックジャックのカードを表現します。
+ *
+ * ブラックジャックのカードを表現する。
  */
 class Card
 {
-    /** 
-     * @var array<string,int> 各カードの点数 
-     * 
-     * 2から9までは、書かれている数の通りの点数
-     * 10,J,Q,Kは10点
-     * Aは1点あるいは11点として、手の点数が最大となる方で数える（初期値 11 にする）
+    /**
+     * コンストラクタ
+     *
+     * @param CardSuit $suit カードのスート
+     * @param CardNumber $number カードの数字('2', '3', ..., 'A')
      */
-    private const CARD_SCORE = [
-        '2' => 2,
-        '3' => 3,
-        '4' => 4,
-        '5' => 5,
-        '6' => 6,
-        '7' => 7,
-        '8' => 8,
-        '9' => 9,
-        '10' => 10,
-        'J' => 10,
-        'Q' => 10,
-        'K' => 10,
-        'A' => 11,
-    ];
-
-    /** 
-     * @var array<int,string> 各カードのマーク 
-     * '♠', '♥', '♦', '♣'の4種類のマークが存在します。
-     */
-    private const SUITS = [
-        '♠',
-        '♥',
-        '♦',
-        '♣',
-    ];
+    public function __construct(
+        private readonly CardSuit $suit,
+        private readonly CardNumber $number,
+    ) {
+    }
 
     /**
-     * 新しくデッキを作成する
+     * カードのスートを取得する
      *
-     * @return array<int,array<string,int|string>> デッキ
-     * 
-     * 各カードは'suit'（マーク）, 'num'（数字）, 'score'（点数）の3つの属性を持つ配列として表現されます。
+     * @return CardSuit カードのスート
      */
-    public function createNewDeck(): array
+    public function getSuit(): CardSuit
     {
-        $deck = [];
-        foreach (self::SUITS as $suit) {
-            foreach (self::CARD_SCORE as $num => $score) {
-                $deck[] = [
-                    'suit' => $suit,
-                    'num' => (string)$num,
-                    'score' => $score,
-                ];
-            }
-        }
-        return $deck;
+        return $this->suit;
+    }
+
+    /**
+     * カードの数字を取得する
+     *
+     * @return CardNumber カードの数字
+     */
+    public function getNumber(): CardNumber
+    {
+        return $this->number;
+    }
+
+    /**
+     * カードの点数を取得する
+     *
+     * @return int カードの点数
+     */
+    public function getScore(): int
+    {
+        return $this->calculateScore($this->number);
+    }
+
+    /**
+     * カードの得点を計算する
+     *
+     * @param CardNumber $number カードの数字
+     * @return int カードの得点
+     */
+    private function calculateScore(CardNumber $number): int
+    {
+        $numberValue = $number->getValue();
+        return match ($numberValue) {
+            'A' => 11,
+            'K', 'Q', 'J' => 10,
+            default => (int)$numberValue,
+        };
     }
 }

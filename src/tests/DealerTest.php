@@ -24,7 +24,7 @@ class DealerTest extends TestCase
     public function testDealOutFirstHand(): void
     {
         $deck = new Deck();
-        $deck->initDeck();
+        $deck->createDeck();
         $player = new ManualPlayer('あなた');
         $dealer = new Dealer(
             new DealerPlayer('ディーラー'),
@@ -41,7 +41,7 @@ class DealerTest extends TestCase
     public function testDealOneCard(): void
     {
         $deck = new Deck();
-        $deck->initDeck();
+        $deck->createDeck();
         $player = new ManualPlayer('あなた');
         $dealer = new Dealer(
             new DealerPlayer('ディーラー'),

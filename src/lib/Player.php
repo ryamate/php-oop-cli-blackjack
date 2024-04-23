@@ -35,7 +35,7 @@ abstract class Player
      * @param string $name プレイヤー名
      * @param int $chips チップ残高
      * @param int $bets ベットした額
-     * @param array<int,array<string,int|string>> $hand 手札
+     * @param array<int,Card> $hand 手札
      * @param int $scoreTotal プレイヤーの現在の得点
      * @param int $countAce プレイヤーの引いた A の枚数
      * @param string $status プレイヤーの状態
@@ -86,7 +86,7 @@ abstract class Player
     /**
      * 手札を返す
      *
-     * @return array<int,array<string,int|string>> $this->hand 手札
+     * @return array<int,Card> $this->hand 手札
      */
     public function getHand(): array
     {
@@ -126,12 +126,12 @@ abstract class Player
     /**
      * 1枚カードを手札に加える
      *
-     * @param array<int,array<string,int|string>> $card
+     * @param Card $card
      * @return void
      */
-    public function addACardToHand(array $card): void
+    public function addCardToHand(Card $card): void
     {
-        $this->hand = array_merge($this->hand, $card);
+        $this->hand[] = $card;
     }
 
     /**
@@ -144,10 +144,10 @@ abstract class Player
         $this->scoreTotal = 0;
         $this->countAce = 0;
         foreach ($this->hand as $card) {
-            if ($card['num'] === 'A') {
+            if ($card->getNumber()->getValue() === 'A') {
                 ++$this->countAce;
             }
-            $this->scoreTotal += $card['score'];
+            $this->scoreTotal += $card->getScore();
         }
         $this->calcAceScore();
     }
@@ -191,7 +191,7 @@ abstract class Player
     /**
      * 手札を変更する
      *
-     * @param array<int,array<string,int|string>> $hand 手札
+     * @param array<int,Card> $hand 手札
      * @return void
      */
     public function changeHand(array $hand): void
