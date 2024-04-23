@@ -90,13 +90,13 @@ class Message
      * プレイヤーが最初に引いたカードについてのメッセージを返す
      *
      * @param  Player $player
-     * @param  array<string, int|string> $card
+     * @param  Card $card
      * @return string $message
      */
-    public static function getPlayerFirstHandMessage(Player $player, array $card): string
+    public static function getPlayerFirstHandMessage(Player $player, Card $card): string
     {
         $message = '';
-        $message .= $player->getName() . 'の引いたカードは' . $card['suit'] . 'の' . $card['num'] . 'です。' . PHP_EOL;
+        $message .= $player->getName() . 'の引いたカードは' . $card->getSuit()->getValue() . 'の' . $card->getNumber()->getValue() . 'です。' . PHP_EOL;
         return $message;
     }
 
@@ -111,7 +111,7 @@ class Message
         $message = '';
         $dealersFirstCard = $dealerPlayer->getHand()[0];
         $message .= 'ディーラーの引いたカードは' .
-            $dealersFirstCard['suit'] . 'の' . $dealersFirstCard['num'] . 'です。' . PHP_EOL;
+            $dealersFirstCard->getSuit()->getValue() . 'の' . $dealersFirstCard->getNumber()->getValue() . 'です。' . PHP_EOL;
         return $message;
     }
 
@@ -176,7 +176,7 @@ class Message
         $hand = $player->getHand();
         $cardDrawn = end($hand);
         $message = $player->getName() . 'の引いたカードは' .
-            $cardDrawn['suit'] . 'の' . $cardDrawn['num'] . 'です。' . PHP_EOL;
+            $cardDrawn->getSuit()->getValue() . 'の' . $cardDrawn->getNumber()->getValue() . 'です。' . PHP_EOL;
         return $message;
     }
 
@@ -222,7 +222,7 @@ class Message
     {
         $dealersSecondCard = $dealerPlayer->getHand()[1];
         $message = 'ディーラーの引いた2枚目のカードは' .
-            $dealersSecondCard['suit'] . 'の' . $dealersSecondCard['num'] . 'でした。' . PHP_EOL;
+            $dealersSecondCard->getSuit()->getValue() . 'の' . $dealersSecondCard->getNumber()->getValue() . 'でした。' . PHP_EOL;
         return $message;
     }
 

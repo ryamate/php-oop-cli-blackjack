@@ -105,9 +105,8 @@ class Dealer
      */
     public function dealOneCard(Deck $deck, Player $player): void
     {
-        $cardDrawn = array_slice($deck->getDeck(), 0, 1);
-        $deck->takeACard();
-        $player->addACardToHand($cardDrawn);
+        $drawnCard = $deck->takeCard();
+        $player->addCardToHand($drawnCard);
         $player->calcScoreTotal();
     }
 }

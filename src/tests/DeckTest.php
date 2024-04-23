@@ -6,30 +6,30 @@ require_once(__DIR__ . '/../lib/Deck.php');
 
 use PHPUnit\Framework\TestCase;
 use Blackjack\Deck;
+use Blackjack\Card;
 
 class DeckTest extends TestCase
 {
+    /**
+     * デッキを初期化するテスト
+     */
     public function testInitDeck(): void
     {
         $deck = new Deck();
-        $deck->initDeck();
-        // デッキの枚数をテストする
+        
         $this->assertSame(52, count($deck->getDeck()));
     }
 
-    public function testTakeACard(): void
+    /**
+     * デッキからカードを引くテスト
+     */
+    public function testTakeCard(): void
     {
         $deck = new Deck();
-        $deck->initDeck();
-
-        // デッキの枚数をテストする
-        $deck->takeACard();
-        $this->assertSame(51, count($deck->getDeck()));
-
-        $deck->takeACard();
-        $this->assertSame(50, count($deck->getDeck()));
-
-        $deck->takeACard();
-        $this->assertSame(49, count($deck->getDeck()));
+        
+        $initialCount = count($deck->getDeck());
+        $card = $deck->takeCard();
+        $this->assertSame($initialCount - 1, count($deck->getDeck()));
+        $this->assertInstanceOf(Card::class, $card);
     }
 }

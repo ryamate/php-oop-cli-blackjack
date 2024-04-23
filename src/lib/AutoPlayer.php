@@ -17,7 +17,7 @@ use Blackjack\Validator;
 /**
  * ノンプレイヤーキャラクタークラス
  */
-class AutoPlayer extends Player implements PlayerAction, PlayerBet
+class AutoPlayer extends Player implements PlayerBet, PlayerAction
 {
     use Validator;
 

@@ -8,6 +8,9 @@ require_once(__DIR__ . '/../lib/Card.php');
 
 use PHPUnit\Framework\TestCase;
 use Blackjack\ManualPlayer;
+use Blackjack\Card;
+use Blackjack\CardSuit;
+use Blackjack\CardNumber;
 
 class ManualPlayerTest extends TestCase
 {
@@ -20,18 +23,18 @@ class ManualPlayerTest extends TestCase
     public function testGetHand(): void
     {
         $player = new ManualPlayer('あなた', 0, 0, [
-            ['suit' => 'スペード', 'num' => '2', 'score' => 2],
-            ['suit' => 'スペード', 'num' => '3', 'score' => 3],
+            ['suit' => '♠', 'num' => '2', 'score' => 2],
+            ['suit' => '♠', 'num' => '3', 'score' => 3],
         ]);
         $this->assertSame(
             [
-                ['suit' => 'スペード', 'num' => '2', 'score' => 2],
-                ['suit' => 'スペード', 'num' => '3', 'score' => 3],
+                ['suit' => '♠', 'num' => '2', 'score' => 2],
+                ['suit' => '♠', 'num' => '3', 'score' => 3],
             ],
             $player->getHand()
         );
     }
-
+    
     public function testGetScoreTotal(): void
     {
         $player = new ManualPlayer('あなた');
@@ -48,20 +51,18 @@ class ManualPlayerTest extends TestCase
         $this->assertSame('stand', $player2->getStatus());
     }
 
-    public function testAddACardToHand(): void
+    public function testAddCardToHand(): void
     {
         $player = new ManualPlayer('あなた', 0, 0, [
-            ['suit' => 'スペード', 'num' => '2', 'score' => 2],
-            ['suit' => 'スペード', 'num' => '3', 'score' => 3],
+            ['suit' => '♠', 'num' => '2', 'score' => 2],
+            ['suit' => '♠', 'num' => '3', 'score' => 3],
         ]);
-        $player->addACardToHand([
-            ['suit' => 'スペード', 'num' => '4', 'score' => 4],
-        ]);
+        $player->addCardToHand(new Card(new CardSuit('♠'),new CardNumber('4')));
         $this->assertSame(
             [
-                ['suit' => 'スペード', 'num' => '2', 'score' => 2],
-                ['suit' => 'スペード', 'num' => '3', 'score' => 3],
-                ['suit' => 'スペード', 'num' => '4', 'score' => 4],
+                ['suit' => '♠', 'num' => '2', 'score' => 2],
+                ['suit' => '♠', 'num' => '3', 'score' => 3],
+                ['suit' => '♠', 'num' => '4', 'score' => 4],
             ],
             $player->getHand()
         );
@@ -70,27 +71,21 @@ class ManualPlayerTest extends TestCase
     public function testCalcScoreTotal(): void
     {
         $player = new ManualPlayer('あなた', 0, 0, [
-            ['suit' => 'スペード', 'num' => 'A', 'score' => 11],
-            ['suit' => 'スペード', 'num' => '3', 'score' => 3],
+            ['suit' => '♠', 'num' => 'A', 'score' => 11],
+            ['suit' => '♠', 'num' => '3', 'score' => 3],
         ]);
         $player->calcScoreTotal();
         $this->assertSame(14, $player->getScoreTotal());
 
-        $player->addACardToHand([
-            ['suit' => 'ハート', 'num' => 'A', 'score' => 11],
-        ]);
+        $player->addCardToHand(new Card(new CardSuit('♥'),new CardNumber('A')));
         $player->calcScoreTotal();
         $this->assertSame(15, $player->getScoreTotal());
 
-        $player->addACardToHand([
-            ['suit' => 'ダイヤ', 'num' => 'A', 'score' => 11],
-        ]);
+        $player->addCardToHand(new Card(new CardSuit('♦'),new CardNumber('A')));
         $player->calcScoreTotal();
         $this->assertSame(16, $player->getScoreTotal());
 
-        $player->addACardToHand([
-            ['suit' => 'クラブ', 'num' => 'A', 'score' => 11],
-        ]);
+        $player->addCardToHand(new Card(new CardSuit('♣'),new CardNumber('A')));
         $player->calcScoreTotal();
         $this->assertSame(17, $player->getScoreTotal());
     }

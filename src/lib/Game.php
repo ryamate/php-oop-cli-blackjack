@@ -165,7 +165,10 @@ class Game
         echo Message::getGameStartMessage();
         sleep(Message::SECONDS_TO_DISPLAY);
 
-        $this->deck->initDeck();
+        $this->deck = new Deck();
+        $this->deck = $this->deck->createDeck();
+        $this->deck->shuffleDeck();
+
         foreach ($this->players as $player) {
             $this->dealer->dealOutFirstHand($this->deck, $player);
         }
